@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug State</title>
+    <style>
+        body { font-family: 'Courier New', monospace; padding: 20px; background: #1e1e1e; color: #0f0; }
+        .section { margin: 20px 0; padding: 15px; background: #2d2d2d; border-radius: 5px; }
+        h2 { color: #0ff; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #0f0; border: none; color: #000; font-weight: bold; }
+        .value { color: #ff0; }
+        .null { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>🐛 Frontend Debug State</h1>
+    
+    <div class="section">
+        <h2>LocalStorage</h2>
+        <div id="localStorage"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Zustand Auth Store</h2>
+        <div id="zustandStore"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Actions</h2>
+        <button onclick="setTestId()">Set Test ID (123456789)</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+        <button onclick="location.reload()">Reload Page</button>
+    </div>
+    
+    <div class="section">
+        <h2>API Test with Current ID</h2>
+        <button onclick="testAPI()">Test API Call</button>
+        <div id="apiResult"></div>
+    </div>
+    
+    <script>
+        function displayLocalStorage() {
+            const div = document.getElementById('localStorage');
+            div.innerHTML = '';
+            
+            const telegramId = localStorage.getItem('telegram_id');
+            const authStorage = localStorage.getItem('auth-storage');
+            
+            div.innerHTML += `<p>telegram_id: <span class="${telegramId ? 'value' : 'null'}">${telegramId || 'null'}</span></p>`;
+            div.innerHTML += `<p>auth-storage: <span class="${authStorage ? 'value' : 'null'}">${authStorage || 'null'}</span></p>`;
+            
+            if (authStorage) {
+                try {
+                    const parsed = JSON.parse(authStorage);
+                    div.innerHTML += `<pre>${JSON.stringify(parsed, null, 2)}</pre>`;
+                } catch (e) {
+                    div.innerHTML += `<p class="null">Failed to parse: ${e.message}</p>`;
+                }
+            }
+        }
+        
+        function displayZustandStore() {
+            const div = document.getElementById('zustandStore');
+            const authStorage = localStorage.getItem('auth-storage');
+            
+            if (authStorage) {
+                try {
+                    const parsed = JSON.parse(authStorage);
+                    div.innerHTML = `<pre>${JSON.stringify(parsed.state, null, 2)}</pre>`;
+                } catch (e) {
+                    div.innerHTML = `<p class="null">Error: ${e.message}</p>`;
+                }
+            } else {
+                div.innerHTML = '<p class="null">No Zustand store found</p>';
+            }
+        }
+        
+        function setTestId() {
+            localStorage.setItem('telegram_id', '123456789');
+            
+            const authStorage = {
+                state: {
+                    telegramId: '123456789',
+                    user: null
+                },
+                version: 0
+            };
+            localStorage.setItem('auth-storage', JSON.stringify(authStorage));
+            
+            alert('Test ID set to 123456789');
+            location.reload();
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            alert('Storage cleared');
+            location.reload();
+        }
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            const telegramId = localStorage.getItem('telegram_id');
+            
+            if (!telegramId) {
+                resultDiv.innerHTML = '<p class="null">No Telegram ID found!</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/v1/transactions/?telegram_id=${telegramId}&limit=5`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p>Status: <span class="value">${response.status}</span></p>
+                    <p>Transactions: <span class="value">${data.length}</span></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="null">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Initial display
+        displayLocalStorage();
+        displayZustandStore();
+        
+        // Auto-refresh every 2 seconds
+        setInterval(() => {
+            displayLocalStorage();
+            displayZustandStore();
+        }, 2000);
+    </script>
+</body>
+</html>

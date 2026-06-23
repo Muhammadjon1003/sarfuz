@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #333; color: #0f0; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>API Test - Fin Backend</h1>
+    
+    <div>
+        <label>Telegram ID: <input type="text" id="telegramId" value="123456789" /></label>
+    </div>
+    
+    <div>
+        <button onclick="testHealth()">Test Health</button>
+        <button onclick="testTransactions()">Test Transactions</button>
+        <button onclick="testSummary()">Test Summary</button>
+        <button onclick="testCategories()">Test Categories</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000/api/v1';
+        
+        function log(title, data) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            resultsDiv.insertBefore(resultDiv, resultsDiv.firstChild);
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_URL}/../health`);
+                const data = await response.json();
+                log('Health Check', { status: response.status, data });
+            } catch (error) {
+                log('Health Check ERROR', { error: error.message });
+            }
+        }
+        
+        async function testTransactions() {
+            try {
+                const telegramId = document.getElementById('telegramId').value;
+                const response = await fetch(`${API_URL}/transactions/?telegram_id=${telegramId}&limit=10`);
+                const data = await response.json();
+                log('Transactions', { 
+                    status: response.status, 
+                    count: data.length,
+                    data: data 
+                });
+            } catch (error) {
+                log('Transactions ERROR', { error: error.message });
+            }
+        }
+        
+        async function testSummary() {
+            try {
+                const telegramId = document.getElementById('telegramId').value;
+                const response = await fetch(`${API_URL}/analytics/summary?telegram_id=${telegramId}`);
+                const data = await response.json();
+                log('Summary', { status: response.status, data });
+            } catch (error) {
+                log('Summary ERROR', { error: error.message });
+            }
+        }
+        
+        async function testCategories() {
+            try {
+                const telegramId = document.getElementById('telegramId').value;
+                const response = await fetch(`${API_URL}/categories/?telegram_id=${telegramId}`);
+                const data = await response.json();
+                log('Categories', { 
+                    status: response.status, 
+                    count: data.length,
+                    data: data 
+                });
+            } catch (error) {
+                log('Categories ERROR', { error: error.message });
+            }
+        }
+    </script>
+</body>
+</html>
