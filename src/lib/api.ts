@@ -72,6 +72,116 @@ export interface Forecast {
   avg_daily_expense: number
 }
 
+export interface DetailedForecast {
+  success: boolean
+  message?: string
+  forecast: DailyForecast[]
+  patterns: ForecastPatterns
+  recurring_transactions: RecurringTransaction[]
+  trends: ForecastTrends
+  warnings: ForecastWarning[]
+  summary: ForecastSummary
+  current_balance: number
+  forecast_period: {
+    start: string
+    end: string
+    days: number
+  }
+}
+
+export interface DailyForecast {
+  date: string
+  date_display: string
+  weekday: string
+  predicted_income: number
+  predicted_expense: number
+  predicted_net: number
+  predicted_balance: number
+  confidence: number
+  has_recurring: boolean
+}
+
+export interface ForecastPatterns {
+  avg_daily_income: number
+  avg_daily_expense: number
+  avg_weekly_income: number
+  avg_weekly_expense: number
+  avg_monthly_income: number
+  avg_monthly_expense: number
+  weekday_income_pattern: number[]
+  weekday_expense_pattern: number[]
+  top_income_categories: CategoryPattern[]
+  top_expense_categories: CategoryPattern[]
+  total_income: number
+  total_expense: number
+  net: number
+}
+
+export interface CategoryPattern {
+  category: string
+  amount: number
+  percentage: number
+}
+
+export interface RecurringTransaction {
+  type: string
+  category: string
+  avg_amount: number
+  pattern: string
+  frequency_days: number
+  occurrences: number
+  confidence: number
+}
+
+export interface ForecastTrends {
+  income_trend: number
+  expense_trend: number
+  income_direction: string
+  expense_direction: string
+  spending_velocity: number
+  velocity_change: number
+}
+
+export interface ForecastWarning {
+  type: string
+  severity: string
+  title: string
+  message: string
+  amount?: number
+  date?: string
+  threshold?: number
+  trend?: number
+  velocity?: number
+  balance?: number
+}
+
+export interface ForecastSummary {
+  total_predicted_income: number
+  total_predicted_expense: number
+  total_predicted_net: number
+  avg_daily_income: number
+  avg_daily_expense: number
+  avg_confidence: number
+  min_balance: number
+  max_balance: number
+  balance_volatility: number
+  days_profitable: number
+  days_loss: number
+  profit_ratio: number
+  starting_balance: number
+  ending_balance: number
+  balance_change: number
+}
+
+export interface SpendingInsights {
+  success: boolean
+  message?: string
+  insights: string[]
+  recommendations: string[]
+  patterns: ForecastPatterns
+  trends: ForecastTrends
+}
+
 // Transactions
 export const getTransactions = (telegramId: string, params?: any) =>
   api.get<Transaction[]>('/transactions/', { params: { telegram_id: telegramId, ...params } })
@@ -116,6 +226,19 @@ export const getTrends = (telegramId: string, days: number = 30) =>
 
 export const getForecast = (telegramId: string, days: number = 30) =>
   api.get<Forecast>('/analytics/forecast', { params: { telegram_id: telegramId, days } })
+
+export const getDetailedForecast = (telegramId: string, forecastDays: number = 30, historicalDays: number = 90) =>
+  api.get<DetailedForecast>('/forecast/', {
+    params: { telegram_id: telegramId, forecast_days: forecastDays, historical_days: historicalDays }
+  })
+
+export const getSpendingInsights = (telegramId: string, days: number = 30) =>
+  api.get<SpendingInsights>('/forecast/insights', { params: { telegram_id: telegramId, days } })
+
+export const getForecastWarnings = (telegramId: string, forecastDays: number = 30) =>
+  api.get<{ warnings: ForecastWarning[]; summary: ForecastSummary }>('/forecast/warnings', {
+    params: { telegram_id: telegramId, forecast_days: forecastDays }
+  })
 
 // User
 export interface User {
@@ -196,3 +319,105 @@ export const getOverdueDebts = (telegramId: string) =>
 
 export const getUpcomingDebts = (telegramId: string, days: number = 7) =>
   api.get<Debt[]>('/debts/upcoming', { params: { telegram_id: telegramId, days } })
+
+
+// Advanced Forecasting
+export interface SeasonalPattern {
+  success: boolean
+  monthly_data: Record<string, { income: number; expense: number; count: number }>
+  avg_monthly_income: number
+  avg_monthly_expense: number
+  peak_income_months: string[]
+  peak_expense_months: string[]
+  insights: string[]
+}
+
+export interface CategoryForecast {
+  category: string
+  type: string
+  predicted_total: number
+  avg_amount: number
+  expected_frequency: number
+  historical_count: number
+}
+
+export interface CategoryForecastResponse {
+  success: boolean
+  forecasts: CategoryForecast[]
+  top_income_categories: CategoryForecast[]
+  top_expense_categories: CategoryForecast[]
+}
+
+export interface ScenarioSimulation {
+  success: boolean
+  scenario_type: string
+  scenario_description: string
+  base_ending_balance: number
+  modified_ending_balance: number
+  balance_difference: number
+  modified_forecast: DailyForecast[]
+  modified_summary: any
+  recommendation: string
+}
+
+export interface Anomaly {
+  date: string
+  amount: number
+  category: string
+  type: string
+  deviation: number
+}
+
+export interface AnomalyDetection {
+  success: boolean
+  anomalies: Anomaly[]
+  count: number
+  mean_amount: number
+  threshold: number
+  insights: string[]
+}
+
+export interface BudgetRecommendation {
+  success: boolean
+  monthly_income: number
+  current_monthly_expense: number
+  savings_rate: number
+  recommended_budgets: {
+    essentials: number
+    lifestyle: number
+    savings: number
+  }
+  category_budgets: Array<{
+    category: string
+    current: number
+    percentage: number
+    recommended: number
+    savings_potential: number
+  }>
+  recommendations: string[]
+}
+
+export const getSeasonalPatterns = (telegramId: string, months: number = 6) =>
+  api.get<SeasonalPattern>('/forecast/seasonal-patterns', { 
+    params: { telegram_id: telegramId, months } 
+  })
+
+export const getCategoryForecast = (telegramId: string, days: number = 30) =>
+  api.get<CategoryForecastResponse>('/forecast/category-forecast', { 
+    params: { telegram_id: telegramId, days } 
+  })
+
+export const simulateScenario = (telegramId: string, scenario: any, forecastDays: number = 30) =>
+  api.post<ScenarioSimulation>(`/forecast/simulate`, scenario, { 
+    params: { telegram_id: telegramId, forecast_days: forecastDays } 
+  })
+
+export const detectAnomalies = (telegramId: string, days: number = 30) =>
+  api.get<AnomalyDetection>('/forecast/anomalies', { 
+    params: { telegram_id: telegramId, days } 
+  })
+
+export const getBudgetRecommendations = (telegramId: string) =>
+  api.get<BudgetRecommendation>('/forecast/budget-recommendations', { 
+    params: { telegram_id: telegramId } 
+  })

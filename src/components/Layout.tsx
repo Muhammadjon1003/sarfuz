@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Receipt, TrendingUp, FolderOpen, Menu, X, User, ChevronLeft, ChevronRight, Users } from 'lucide-react'
+import { LayoutDashboard, Receipt, TrendingUp, FolderOpen, Menu, X, User, ChevronLeft, ChevronRight, Users, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'Tranzaksiyalar', href: '/transactions', icon: Receipt },
   { name: 'Qarzlar', href: '/debts', icon: Users },
   { name: 'Tahlil', href: '/analytics', icon: TrendingUp },
+  { name: 'Prognoz', href: '/forecasting', icon: Sparkles },
   { name: 'Kategoriyalar', href: '/categories', icon: FolderOpen },
 ]
 

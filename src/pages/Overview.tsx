@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
-import { getSummary, getTransactions, getCategoryBreakdown, getTrends, getDebtSummary } from '@/lib/api'
+import { getSummary, getTransactions, getCategoryBreakdown, getTrends, getDebtSummary, getForecastWarnings } from '@/lib/api'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { DollarSign, Receipt, ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react'
+import { DollarSign, Receipt, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle } from 'lucide-react'
 import { useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import AddTransactionDialog from '@/components/AddTransactionDialog'
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
 
@@ -40,6 +41,13 @@ export default function Overview() {
   const { data: trends } = useQuery({
     queryKey: ['trends', telegramId, 30],
     queryFn: () => getTrends(telegramId!, 30).then((res) => res.data),
+    enabled: !!telegramId,
+  })
+
+  // Get forecast warnings
+  const { data: forecastWarnings } = useQuery({
+    queryKey: ['forecast-warnings', telegramId],
+    queryFn: () => getForecastWarnings(telegramId!, 30).then((res) => res.data),
     enabled: !!telegramId,
   })
 
@@ -86,6 +94,33 @@ export default function Overview() {
         </div>
       ) : (
         <>
+          {/* Forecast Warnings */}
+          {forecastWarnings && forecastWarnings.warnings && forecastWarnings.warnings.length > 0 && (
+            <Link to="/forecasting">
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-orange-900">⚠️ Moliyaviy ogohlantirishlar</h3>
+                      <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                        {forecastWarnings.warnings.length} ta
+                      </span>
+                    </div>
+                    <ul className="space-y-1">
+                      {forecastWarnings.warnings.slice(0, 2).map((warning, index) => (
+                        <li key={index} className="text-sm text-orange-800">{warning.title}</li>
+                      ))}
+                    </ul>
+                    <p className="text-xs text-orange-600 mt-2 font-medium">
+                      Batafsil prognoz uchun bosing →
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          )}
+
           {/* Financial Freedom Chart */}
           {financialFreedomData.length > 0 && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
