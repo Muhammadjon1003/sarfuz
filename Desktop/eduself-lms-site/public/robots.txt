@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Crawl-delay: 1
-
-# Sitemap
-Sitemap: https://eduself.uz/sitemap.xml
-Sitemap: https://mylms.eduself.uz/sitemap.xml
