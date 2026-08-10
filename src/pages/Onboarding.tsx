@@ -14,6 +14,8 @@ import {
   faUserGroup 
 } from '@fortawesome/free-solid-svg-icons'
 
+import logoDark from '@/assets/logo-dark.png'
+
 export default function Onboarding() {
   const [telegramId, setTelegramIdInput] = useState('')
   const [isHovered, setIsHovered] = useState<number | null>(null)
@@ -90,11 +92,18 @@ export default function Onboarding() {
               <FontAwesomeIcon icon={faWandMagicSparkles} className="w-4 h-4" />
               AI Bilan Ishlaydigan Moliya Menejeri
             </div>
-            <h1 className="text-5xl md:text-6xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-100 to-teal-300 tracking-tight">
-              Biznes Moliya Menejeri
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img
+                src={logoDark}
+                alt="SARF Logo"
+                className="w-16 h-16 rounded-2xl object-cover border border-cyan-400/40 shadow-[0_0_25px_rgba(0,242,254,0.4)]"
+              />
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-100 to-teal-300 tracking-wider uppercase">
+              SARF
             </h1>
             <p className="text-lg md:text-xl text-teal-200/70 max-w-3xl mx-auto mb-8 font-normal leading-relaxed">
-              Telegram bot va zamonaviy web boshqaruv bo'limi orqali biznesingiz moliyasini aqlli boshqaring
+              Biznesingiz moliyasini Telegram bot va zamonaviy web platforma orqali aqlli boshqaring
             </p>
             
             {/* Stats */}

@@ -19,6 +19,7 @@ import { useAuthStore } from '@/store/authStore'
 import { getUser } from '@/lib/api'
 import NotificationModal from '@/components/NotificationModal'
 import AddTransactionDialog from '@/components/AddTransactionDialog'
+import logoDark from '@/assets/logo-dark.png'
 
 const navigation = [
   { name: "Boshqaruv bo'limi", href: '/', icon: faChartPie },
@@ -41,29 +42,26 @@ export default function Layout() {
   useEffect(() => {
     if (telegramId && !user) {
       getUser(telegramId)
-        .then((res) => setUser(res.data))
+        .then((res) => {
+          if (res.data) setUser(res.data)
+        })
         .catch((err) => console.error('Failed to fetch user:', err))
     }
   }, [telegramId, user, setUser])
 
-  const currentPage = navigation.find(item => {
-    if (item.href === '/') {
-      return location.pathname === '/'
-    }
-    return location.pathname.startsWith(item.href)
-  })
-
   const toggleSidebar = () => {
-    const newState = !sidebarCollapsed
-    setSidebarCollapsed(newState)
-    localStorage.setItem('sidebar-collapsed', String(newState))
+    const nextState = !sidebarCollapsed
+    setSidebarCollapsed(nextState)
+    localStorage.setItem('sidebar-collapsed', String(nextState))
   }
 
+  const currentPage = navigation.find((item) => item.href === location.pathname)
+
   return (
-    <div className="min-h-screen text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Background radial ambient lights: Vibrant Top-Left Cyan & Bottom-Right Blackish */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-44 -left-44 w-[42rem] h-[42rem] bg-cyan-400/25 rounded-full blur-[130px]"></div>
+    <div className="min-h-screen bg-[#040e12] text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+      {/* Background ambient lighting */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-cyan-500/10 rounded-full blur-[140px]"></div>
         <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[35rem] h-[35rem] bg-teal-500/10 rounded-full blur-[140px]"></div>
         <div className="absolute -bottom-44 -right-44 w-[45rem] h-[45rem] bg-black/90 rounded-full blur-[120px]"></div>
       </div>
@@ -80,20 +78,24 @@ export default function Layout() {
           <div className="flex items-center justify-between h-20 px-5 border-b border-teal-500/10">
             {!sidebarCollapsed ? (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)] border border-cyan-300/30">
-                  <span className="text-slate-950 font-black text-base tracking-wider">FM</span>
-                </div>
+                <img
+                  src={logoDark}
+                  alt="SARF"
+                  className="w-10 h-10 rounded-xl object-cover border border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                />
                 <div>
-                  <h1 className="text-base font-bold bg-gradient-to-r from-white via-cyan-100 to-teal-200 bg-clip-text text-transparent">
-                    Finance Manager
+                  <h1 className="text-lg font-black tracking-wider bg-gradient-to-r from-white via-cyan-100 to-teal-200 bg-clip-text text-transparent uppercase">
+                    SARF
                   </h1>
-                  <p className="text-[10px] text-teal-400/70 uppercase tracking-widest font-medium">Pro Dashboard</p>
+                  <p className="text-[10px] text-teal-400/70 uppercase tracking-widest font-semibold">Biznes Moliya</p>
                 </div>
               </div>
             ) : (
-              <div className="w-10 h-10 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-xl flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(6,182,212,0.4)] border border-cyan-300/30">
-                <span className="text-slate-950 font-black text-base">FM</span>
-              </div>
+              <img
+                src={logoDark}
+                alt="SARF"
+                className="w-10 h-10 rounded-xl object-cover mx-auto border border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+              />
             )}
           </div>
 
@@ -222,9 +224,11 @@ export default function Layout() {
             <div className="flex items-center gap-3">
               {/* Page Header Title */}
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-xl flex items-center justify-center lg:hidden shadow-[0_0_12px_rgba(6,182,212,0.4)]">
-                  <span className="text-slate-950 font-black text-sm">FM</span>
-                </div>
+                <img
+                  src={logoDark}
+                  alt="SARF"
+                  className="w-9 h-9 rounded-xl object-cover lg:hidden border border-cyan-400/30 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
+                />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
                     {currentPage?.name || "Boshqaruv bo'limi"}
