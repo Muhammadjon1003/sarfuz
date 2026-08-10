@@ -7,12 +7,7 @@ import { formatCurrency } from '@/lib/utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faBell,
-  faTriangleExclamation,
-  faCircleCheck,
-  faClock,
   faXmark,
-  faChevronRight,
-  faShieldHalved,
 } from '@fortawesome/free-solid-svg-icons'
 
 export default function NotificationModal() {
@@ -76,13 +71,20 @@ export default function NotificationModal() {
         )}
       </button>
 
-      {/* Notification Dropdown Popover */}
+      {/* Mobile Backdrop */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-sm sm:w-96 z-50 glass-panel rounded-3xl border border-teal-500/30 shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div
+          className="fixed inset-0 z-40 sm:hidden bg-black/40 backdrop-blur-xs"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Notification Dropdown Popover (Fully Responsive for Mobile, Tablet & Desktop) */}
+      {isOpen && (
+        <div className="fixed top-20 right-4 left-4 sm:left-auto sm:absolute sm:right-0 sm:top-auto sm:mt-3 w-auto sm:w-96 max-w-md z-50 glass-panel rounded-3xl border border-teal-500/30 shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-teal-500/15">
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faBell} className="w-4 h-4 text-cyan-400" />
               <h3 className="font-bold text-white text-sm">Bildirishnomalar</h3>
               {totalNotifications > 0 && (
                 <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-[10px] font-bold text-cyan-300">
@@ -98,41 +100,34 @@ export default function NotificationModal() {
             </button>
           </div>
 
-          {/* Body List */}
-          <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
-            {/* Forecast Financial Risk Warnings */}
+          {/* Body List - Iconless, Color-Coded Notification Cards */}
+          <div className="space-y-3 max-h-[60vh] sm:max-h-[360px] overflow-y-auto pr-1">
+            {/* Forecast Financial Risk Warnings (Amber Theme) */}
             {warningsList.map((warning, index) => (
               <div
                 key={index}
-                className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3 group hover:border-amber-400/50 transition-all"
+                className="p-3.5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-400 border-y border-r border-amber-500/20 group hover:border-amber-400/50 transition-all"
               >
-                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30 flex-shrink-0">
-                  <FontAwesomeIcon icon={faTriangleExclamation} className="w-4 h-4" />
-                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-amber-200 truncate">{warning.title}</p>
                   <p className="text-[11px] text-amber-100/70 mt-0.5 line-clamp-2">{warning.message}</p>
                   <Link
                     to="/forecasting"
                     onClick={() => setIsOpen(false)}
-                    className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 hover:text-amber-200 mt-2"
+                    className="inline-flex items-center text-[10px] font-bold text-amber-300 hover:text-amber-200 mt-2 transition-colors"
                   >
-                    <span>Prognozni ko'rish</span>
-                    <FontAwesomeIcon icon={faChevronRight} className="w-2.5 h-2.5" />
+                    <span>Prognozni ko'rish →</span>
                   </Link>
                 </div>
               </div>
             ))}
 
-            {/* Overdue Debts Notifications */}
+            {/* Overdue Debts Notifications (Rose Theme) */}
             {debtsList.map((debt) => (
               <div
                 key={debt.id}
-                className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/25 flex items-start gap-3 group hover:border-rose-400/50 transition-all"
+                className="p-3.5 rounded-2xl bg-rose-500/10 border-l-4 border-rose-400 border-y border-r border-rose-500/20 group hover:border-rose-400/50 transition-all"
               >
-                <div className="p-2 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-400/30 flex-shrink-0">
-                  <FontAwesomeIcon icon={faClock} className="w-4 h-4" />
-                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-bold text-rose-200 truncate">{debt.person_name}</p>
@@ -146,21 +141,17 @@ export default function NotificationModal() {
                   <Link
                     to="/debts"
                     onClick={() => setIsOpen(false)}
-                    className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-300 hover:text-rose-200 mt-2"
+                    className="inline-flex items-center text-[10px] font-bold text-rose-300 hover:text-rose-200 mt-2 transition-colors"
                   >
-                    <span>Qarzlarni boshqarish</span>
-                    <FontAwesomeIcon icon={faChevronRight} className="w-2.5 h-2.5" />
+                    <span>Qarzlarni boshqarish →</span>
                   </Link>
                 </div>
               </div>
             ))}
 
-            {/* All clear state */}
+            {/* All Clear State (Emerald Theme) */}
             {totalNotifications === 0 && (
-              <div className="text-center py-8 px-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
-                <div className="w-12 h-12 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <FontAwesomeIcon icon={faCircleCheck} className="w-6 h-6" />
-                </div>
+              <div className="p-4 bg-emerald-500/10 border-l-4 border-emerald-400 border-y border-r border-emerald-500/20 rounded-2xl">
                 <p className="text-sm font-bold text-emerald-300">Barchasi joyida!</p>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Moliyaviy xavflar va kechikkan qarzlar mavjud emas.
@@ -171,8 +162,8 @@ export default function NotificationModal() {
 
           {/* Footer */}
           <div className="pt-3 mt-4 border-t border-teal-500/15 flex items-center justify-between text-[11px] text-slate-400">
-            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-              <FontAwesomeIcon icon={faShieldHalved} className="w-3.5 h-3.5" /> Himoyalangan
+            <span className="text-emerald-400 font-semibold">
+              Himoyalangan tizim
             </span>
             <Link
               to="/forecasting"
