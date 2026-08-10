@@ -4,34 +4,228 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --background: 198 60% 5%;
+    --foreground: 195 25% 95%;
+    --card: 198 50% 8%;
+    --card-foreground: 195 25% 95%;
+    --popover: 198 50% 8%;
+    --popover-foreground: 195 25% 95%;
+    --primary: 187 96% 50%;
+    --primary-foreground: 198 60% 5%;
+    --secondary: 195 40% 15%;
+    --secondary-foreground: 195 25% 95%;
+    --muted: 195 30% 14%;
+    --muted-foreground: 192 15% 65%;
+    --accent: 187 85% 43%;
+    --accent-foreground: 198 60% 5%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --border: 195 30% 18%;
+    --input: 195 30% 18%;
+    --ring: 187 96% 50%;
+    --radius: 0.75rem;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-teal-500/20;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-slate-100 antialiased min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200;
+    background: linear-gradient(135deg, #073543 0%, #041c24 35%, #031219 70%, #010609 100%);
+    background-attachment: fixed;
   }
+}
+
+/* Glassmorphism custom utilities */
+.glass-panel {
+  background: rgba(6, 24, 31, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-interactive {
+  background: rgba(6, 24, 31, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-interactive:hover {
+  background: rgba(10, 34, 44, 0.75);
+  border-color: rgba(6, 182, 212, 0.35);
+  box-shadow: 0 12px 40px 0 rgba(0, 242, 254, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.glass-card-gradient {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(20, 184, 166, 0.25) 50%, rgba(6, 182, 212, 0.15) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.4), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Custom glowing scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(4, 14, 18, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 184, 166, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.6);
+}
+
+/* Custom Staircase Ball Bouncing Loader (Uiverse.io styled for Dark Cyan Theme) */
+.loader {
+  position: relative;
+  width: 75px;
+  height: 100px;
+}
+
+.loader__bar {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 50%;
+  background: linear-gradient(to top, rgba(20, 184, 166, 0.3), #00f2fe);
+  border-radius: 3px 3px 0 0;
+  transform-origin: center bottom;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.25);
+}
+
+.loader__bar:nth-child(1) {
+  left: 0px;
+  transform: scale(1, 0.2);
+  -webkit-animation: barUp1 4s infinite;
+  animation: barUp1 4s infinite;
+}
+
+.loader__bar:nth-child(2) {
+  left: 15px;
+  transform: scale(1, 0.4);
+  -webkit-animation: barUp2 4s infinite;
+  animation: barUp2 4s infinite;
+}
+
+.loader__bar:nth-child(3) {
+  left: 30px;
+  transform: scale(1, 0.6);
+  -webkit-animation: barUp3 4s infinite;
+  animation: barUp3 4s infinite;
+}
+
+.loader__bar:nth-child(4) {
+  left: 45px;
+  transform: scale(1, 0.8);
+  -webkit-animation: barUp4 4s infinite;
+  animation: barUp4 4s infinite;
+}
+
+.loader__bar:nth-child(5) {
+  left: 60px;
+  transform: scale(1, 1);
+  -webkit-animation: barUp5 4s infinite;
+  animation: barUp5 4s infinite;
+}
+
+.loader__ball {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background: #00f2fe;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #00f2fe, 0 0 20px rgba(0, 242, 254, 0.8);
+  -webkit-animation: ball624 4s infinite;
+  animation: ball624 4s infinite;
+}
+
+@keyframes ball624 {
+  0% { transform: translate(0, 0); }
+  5% { transform: translate(8px, -14px); }
+  10% { transform: translate(15px, -10px); }
+  17% { transform: translate(23px, -24px); }
+  20% { transform: translate(30px, -20px); }
+  27% { transform: translate(38px, -34px); }
+  30% { transform: translate(45px, -30px); }
+  37% { transform: translate(53px, -44px); }
+  40% { transform: translate(60px, -40px); }
+  50% { transform: translate(60px, 0); }
+  57% { transform: translate(53px, -14px); }
+  60% { transform: translate(45px, -10px); }
+  67% { transform: translate(37px, -24px); }
+  70% { transform: translate(30px, -20px); }
+  77% { transform: translate(22px, -34px); }
+  80% { transform: translate(15px, -30px); }
+  87% { transform: translate(7px, -44px); }
+  90% { transform: translate(0, -40px); }
+  100% { transform: translate(0, 0); }
+}
+
+@-webkit-keyframes barUp1 {
+  0%, 40% { transform: scale(1, 0.2); }
+  50%, 90% { transform: scale(1, 1); }
+  100% { transform: scale(1, 0.2); }
+}
+
+@keyframes barUp1 {
+  0%, 40% { transform: scale(1, 0.2); }
+  50%, 90% { transform: scale(1, 1); }
+  100% { transform: scale(1, 0.2); }
+}
+
+@-webkit-keyframes barUp2 {
+  0%, 40% { transform: scale(1, 0.4); }
+  50%, 90% { transform: scale(1, 0.8); }
+  100% { transform: scale(1, 0.4); }
+}
+
+@keyframes barUp2 {
+  0%, 40% { transform: scale(1, 0.4); }
+  50%, 90% { transform: scale(1, 0.8); }
+  100% { transform: scale(1, 0.4); }
+}
+
+@-webkit-keyframes barUp3 {
+  0%, 100% { transform: scale(1, 0.6); }
+}
+
+@keyframes barUp3 {
+  0%, 100% { transform: scale(1, 0.6); }
+}
+
+@-webkit-keyframes barUp4 {
+  0%, 40% { transform: scale(1, 0.8); }
+  50%, 90% { transform: scale(1, 0.4); }
+  100% { transform: scale(1, 0.8); }
+}
+
+@keyframes barUp4 {
+  0%, 40% { transform: scale(1, 0.8); }
+  50%, 90% { transform: scale(1, 0.4); }
+  100% { transform: scale(1, 0.8); }
+}
+
+@-webkit-keyframes barUp5 {
+  0%, 40% { transform: scale(1, 1); }
+  50%, 90% { transform: scale(1, 0.2); }
+  100% { transform: scale(1, 1); }
+}
+
+@keyframes barUp5 {
+  0%, 40% { transform: scale(1, 1); }
+  50%, 90% { transform: scale(1, 0.2); }
+  100% { transform: scale(1, 1); }
 }

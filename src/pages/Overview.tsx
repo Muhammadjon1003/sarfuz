@@ -1,12 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
-import { getSummary, getTransactions, getCategoryBreakdown, getTrends, getDebtSummary, getForecastWarnings } from '@/lib/api'
-import { formatCurrency, formatDate } from '@/lib/utils'
-import { DollarSign, Receipt, ArrowUpRight, ArrowDownRight, TrendingUp, AlertTriangle } from 'lucide-react'
+import { getSummary, getTransactions, getCategoryBreakdown, getTrends, getDebtSummary } from '@/lib/api'
+import { formatCurrency, formatDate, fillDailyTrendTimeline } from '@/lib/utils'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { 
+  faPlus, 
+  faReceipt, 
+  faArrowTrendUp, 
+  faArrowTrendDown, 
+  faDollarSign, 
+  faUserGroup, 
+  faWandMagicSparkles 
+} from '@fortawesome/free-solid-svg-icons'
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import AddTransactionDialog from '@/components/AddTransactionDialog'
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
+
+import Loader from '@/components/Loader'
+import { CategoryIcon } from '@/lib/categoryIcons'
+import StackedCards from '@/components/StackedCards'
 
 export default function Overview() {
   const { telegramId } = useAuthStore()
@@ -37,304 +50,292 @@ export default function Overview() {
     enabled: !!telegramId,
   })
 
-  // Get trends for financial freedom chart
   const { data: trends } = useQuery({
     queryKey: ['trends', telegramId, 30],
     queryFn: () => getTrends(telegramId!, 30).then((res) => res.data),
     enabled: !!telegramId,
   })
 
-  // Get forecast warnings
-  const { data: forecastWarnings } = useQuery({
-    queryKey: ['forecast-warnings', telegramId],
-    queryFn: () => getForecastWarnings(telegramId!, 30).then((res) => res.data),
-    enabled: !!telegramId,
-  })
-
-  // Calculate cumulative balance (financial freedom)
   const financialFreedomData = useMemo(() => {
-    if (!trends) return []
-    
-    let cumulativeBalance = 0
-    return trends.map((trend) => {
-      cumulativeBalance += trend.income - trend.expense
-      return {
-        date: trend.date,
-        balance: cumulativeBalance,
-        income: trend.income,
-        expense: trend.expense,
-      }
-    })
+    return fillDailyTrendTimeline(trends, 30)
   }, [trends])
 
   if (summaryLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    )
+    return <Loader />
   }
 
   const hasData = summary && summary.transaction_count > 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Top Banner & Quick Add Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            Umumiy Sharh
+            <span className="text-xs px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 font-medium">
+              Jonli Rejim
+            </span>
+          </h2>
+          <p className="text-sm text-teal-200/60 mt-1">Moliyaviy hisobotlar va dinamik tahlillar</p>
+        </div>
+
+        <button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 hover:from-teal-300 hover:to-sky-300 text-slate-950 font-bold text-sm shadow-[0_0_25px_rgba(0,242,254,0.4)] transition-all duration-200 hover:scale-105 active:scale-95"
+        >
+          <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+          <span>Yangi Amal</span>
+        </button>
+      </div>
+
       {!hasData ? (
         /* Empty State */
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Receipt className="w-8 h-8 text-gray-400" />
+        <div className="glass-panel rounded-3xl p-12 text-center border border-teal-500/20 shadow-2xl relative overflow-hidden">
+          <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/20 to-teal-500/10 border border-cyan-400/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,242,254,0.15)]">
+            <FontAwesomeIcon icon={faReceipt} className="w-8 h-8 text-cyan-300" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Tranzaksiya yo'q
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Amal topilmadi
           </h2>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            Birinchi tranzaksiyangizni qo'shing. Telegram bot orqali ovozli xabar yuboring.
+          <p className="text-teal-200/60 mb-8 max-w-md mx-auto text-sm leading-relaxed">
+            Birinchi amalingizni qo'shing yoki Telegram bot orqali ovozli xabar yuboring.
           </p>
+          <button
+            onClick={() => setIsAddDialogOpen(true)}
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-semibold text-sm shadow-lg hover:shadow-cyan-500/20 transition-all"
+          >
+            Amal yaratish
+          </button>
         </div>
       ) : (
         <>
-          {/* Forecast Warnings */}
-          {forecastWarnings && forecastWarnings.warnings && forecastWarnings.warnings.length > 0 && (
-            <Link to="/forecasting">
-              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-orange-900">⚠️ Moliyaviy ogohlantirishlar</h3>
-                      <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
-                        {forecastWarnings.warnings.length} ta
-                      </span>
-                    </div>
-                    <ul className="space-y-1">
-                      {forecastWarnings.warnings.slice(0, 2).map((warning, index) => (
-                        <li key={index} className="text-sm text-orange-800">{warning.title}</li>
-                      ))}
-                    </ul>
-                    <p className="text-xs text-orange-600 mt-2 font-medium">
-                      Batafsil prognoz uchun bosing →
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          )}
+          {/* Top Hero Grid: Credit Card Preview & Financial Freedom Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Credit Card / Business Account Showcase */}
+            <StackedCards
+              netBalance={summary.net}
+              totalExpense={summary.total_expense}
+              totalIncome={summary.total_income}
+              formatCurrency={formatCurrency}
+            />
 
-          {/* Financial Freedom Chart */}
-          {financialFreedomData.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <h2 className="text-lg font-semibold text-gray-900">Moliyaviy Erkinlik</h2>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Joriy balans</p>
-                  <p className={`text-xl font-bold ${
-                    financialFreedomData[financialFreedomData.length - 1]?.balance >= 0 
-                      ? 'text-green-600' 
-                      : 'text-red-600'
-                  }`}>
-                    {formatCurrency(financialFreedomData[financialFreedomData.length - 1]?.balance || 0)}
-                  </p>
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={200}>
-                <AreaChart data={financialFreedomData}>
-                  <defs>
-                    <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 11 }}
-                    stroke="#9ca3af"
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 11 }}
-                    stroke="#9ca3af"
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => formatCurrency(value)}
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      fontSize: '12px'
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="balance" 
-                    stroke="#3b82f6" 
-                    strokeWidth={2}
-                    fill="url(#balanceGradient)"
-                    name="Balans"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Income */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
+            {/* Financial Freedom Chart */}
+            <div className="lg:col-span-2 glass-panel rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-green-50 rounded-lg">
-                    <ArrowUpRight className="w-5 h-5 text-green-600" />
+                  <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-400/30 text-cyan-400">
+                    <FontAwesomeIcon icon={faArrowTrendUp} className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Kirim</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-0.5">
-                      {formatCurrency(summary.total_income)}
-                    </p>
+                    <h2 className="text-lg font-bold text-white">Moliyaviy Erkinlik Dinamikasi</h2>
+                    <p className="text-xs text-teal-200/60">Oxirgi 30 kunlik jamg'arma grafigi</p>
                   </div>
                 </div>
+
+                {financialFreedomData.length > 0 && (
+                  <div className="text-left sm:text-right">
+                    <span className="text-[11px] uppercase tracking-wider text-teal-200/60 font-medium">O'sish Trendi</span>
+                    <p className={`text-lg font-extrabold ${
+                      financialFreedomData[financialFreedomData.length - 1]?.balance >= 0 
+                        ? 'text-cyan-300' 
+                        : 'text-rose-400'
+                    }`}>
+                      {formatCurrency(financialFreedomData[financialFreedomData.length - 1]?.balance || 0)}
+                    </p>
+                  </div>
+                )}
               </div>
-              {summary.income_change !== undefined && (
-                <div className="flex items-center gap-1 text-sm">
-                  <span
-                    className={`font-medium ${
-                      summary.income_change >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}
-                  >
+
+              {financialFreedomData.length > 0 && (
+                <div className="h-[180px] w-full mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={financialFreedomData}>
+                      <defs>
+                        <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#00f2fe" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#00f2fe" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(20, 184, 166, 0.15)" vertical={false} />
+                      <XAxis 
+                        dataKey="date_display" 
+                        tick={{ fontSize: 10, fill: '#94a3b8' }}
+                        axisLine={false}
+                        tickLine={false}
+                        minTickGap={25}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 10, fill: '#94a3b8' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => [formatCurrency(value), "Balans"]}
+                        contentStyle={{ 
+                          backgroundColor: '#071d24', 
+                          borderColor: 'rgba(6, 182, 212, 0.3)',
+                          borderRadius: '12px',
+                          color: '#fff',
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                          fontSize: '12px'
+                        }}
+                      />
+                      <Area 
+                        type="natural" 
+                        dataKey="balance" 
+                        stroke="#00f2fe" 
+                        strokeWidth={3}
+                        fill="url(#balanceGradient)"
+                        name="Balans"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 4 Primary Metric Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Kirim / Daromad (Income) */}
+            <div className="glass-panel-interactive rounded-2xl p-5 border border-emerald-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Jami Daromad</span>
+                <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                  <FontAwesomeIcon icon={faArrowTrendUp} className="w-4 h-4" />
+                </div>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-white tracking-tight">
+                  {formatCurrency(summary.total_income)}
+                </p>
+                {summary.income_change !== undefined && (
+                  <p className={`text-xs mt-2 font-semibold flex items-center gap-1 ${
+                    summary.income_change >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                  }`}>
                     {summary.income_change >= 0 ? '+' : ''}
                     {summary.income_change.toFixed(1)}%
-                  </span>
-                  <span className="text-gray-500">oldingi davr</span>
-                </div>
-              )}
+                    <span className="text-slate-500 font-normal">oldingi davrdan</span>
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Expense */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-red-50 rounded-lg">
-                    <ArrowDownRight className="w-5 h-5 text-red-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Chiqim</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-0.5">
-                      {formatCurrency(summary.total_expense)}
-                    </p>
-                  </div>
+            {/* Chiqim (Expense) */}
+            <div className="glass-panel-interactive rounded-2xl p-5 border border-rose-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Jami Chiqim</span>
+                <div className="p-2 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.2)]">
+                  <FontAwesomeIcon icon={faArrowTrendDown} className="w-4 h-4" />
                 </div>
               </div>
-              {summary.expense_change !== undefined && (
-                <div className="flex items-center gap-1 text-sm">
-                  <span
-                    className={`font-medium ${
-                      summary.expense_change <= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}
-                  >
+              <div>
+                <p className="text-2xl font-black text-white tracking-tight">
+                  {formatCurrency(summary.total_expense)}
+                </p>
+                {summary.expense_change !== undefined && (
+                  <p className={`text-xs mt-2 font-semibold flex items-center gap-1 ${
+                    summary.expense_change <= 0 ? 'text-emerald-400' : 'text-rose-400'
+                  }`}>
                     {summary.expense_change >= 0 ? '+' : ''}
                     {summary.expense_change.toFixed(1)}%
-                  </span>
-                  <span className="text-gray-500">oldingi davr</span>
-                </div>
-              )}
-            </div>
-
-            {/* Debt Balance */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-orange-50 rounded-lg">
-                    <span className="text-xl">🤝</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Qarz</p>
-                    <p
-                      className={`text-2xl font-bold mt-0.5 ${
-                        debtSummary && debtSummary.net_debt > 0 
-                          ? 'text-red-600' 
-                          : debtSummary && debtSummary.net_debt < 0 
-                          ? 'text-green-600' 
-                          : 'text-gray-900'
-                      }`}
-                    >
-                      {debtSummary ? formatCurrency(Math.abs(debtSummary.net_debt)) : formatCurrency(0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="text-sm text-gray-500">
-                {debtSummary && debtSummary.net_debt > 0 
-                  ? 'Men qarzdorman' 
-                  : debtSummary && debtSummary.net_debt < 0 
-                  ? 'Menga qarzdor' 
-                  : 'Qarz yo\'q'}
+                    <span className="text-slate-500 font-normal">oldingi davrdan</span>
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Net */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-blue-50 rounded-lg">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Sof foyda</p>
-                    <p
-                      className={`text-2xl font-bold mt-0.5 ${
-                        summary.net >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}
-                    >
-                      {formatCurrency(summary.net)}
-                    </p>
-                  </div>
+            {/* Qarz (Debt Balance) */}
+            <div className="glass-panel-interactive rounded-2xl p-5 border border-amber-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Qarz Balansi</span>
+                <div className="p-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                  <FontAwesomeIcon icon={faUserGroup} className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-sm text-gray-500">
-                {summary.transaction_count} tranzaksiya
+              <div>
+                <p className={`text-2xl font-black tracking-tight ${
+                  debtSummary && debtSummary.net_debt > 0 
+                    ? 'text-rose-400' 
+                    : debtSummary && debtSummary.net_debt < 0 
+                    ? 'text-emerald-400' 
+                    : 'text-white'
+                }`}>
+                  {debtSummary ? formatCurrency(Math.abs(debtSummary.net_debt)) : formatCurrency(0)}
+                </p>
+                <p className="text-xs text-slate-400 mt-2 font-medium">
+                  {debtSummary && debtSummary.net_debt > 0 
+                    ? 'Men qarzdorman' 
+                    : debtSummary && debtSummary.net_debt < 0 
+                    ? 'Menga qarzdor' 
+                    : 'Qarzdorlik yo\'q'}
+                </p>
+              </div>
+            </div>
+
+            {/* Sof foyda (Net Balance) */}
+            <div className="glass-panel-interactive rounded-2xl p-5 border border-cyan-500/20 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Sof Foyda</span>
+                <div className="p-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+                  <FontAwesomeIcon icon={faDollarSign} className="w-4 h-4" />
+                </div>
+              </div>
+              <div>
+                <p className={`text-2xl font-black tracking-tight ${
+                  summary.net >= 0 ? 'text-cyan-300' : 'text-rose-400'
+                }`}>
+                  {formatCurrency(summary.net)}
+                </p>
+                <p className="text-xs text-slate-400 mt-2 font-medium">
+                  {summary.transaction_count} ta amal bajarildi
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Recent Transactions & Top Expenses */}
+          {/* Recent Transactions & Top Expenses Lists */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Transactions */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Oxirgi tranzaksiyalar
+            {/* Oxirgi Amallar Panel */}
+            <div className="glass-panel rounded-3xl overflow-hidden border border-teal-500/20 flex flex-col justify-between">
+              <div className="px-6 py-4 border-b border-teal-500/15 flex items-center justify-between">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <FontAwesomeIcon icon={faReceipt} className="w-4 h-4 text-cyan-400" />
+                  Oxirgi Amallar
                 </h2>
+                <Link to="/transactions" className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+                  Barchasini ko'rish →
+                </Link>
               </div>
-              <div className="p-6">
+              <div className="p-6 flex-1">
                 {recentTransactions && recentTransactions.length > 0 ? (
                   <div className="space-y-3">
                     {recentTransactions.map((transaction) => (
                       <div
                         key={transaction.id}
-                        className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                        className="flex items-center justify-between p-3.5 rounded-xl bg-teal-950/30 border border-teal-500/10 hover:border-cyan-500/30 hover:bg-teal-900/30 transition-all group"
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                            style={{ backgroundColor: transaction.category_color + '15' }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-lg border border-white/10 shadow-sm text-cyan-300 font-bold"
+                            style={{ backgroundColor: (transaction.category_color || '#00f2fe') + '25' }}
                           >
-                            {transaction.category_icon || '💰'}
+                            <CategoryIcon name={transaction.category_name} icon={transaction.category_icon} className="w-4 h-4 text-cyan-300" />
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900 text-sm">
+                            <p className="font-semibold text-slate-100 text-sm group-hover:text-cyan-300 transition-colors">
                               {transaction.category_name || 'Boshqa'}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-[11px] text-slate-400">
                               {formatDate(transaction.transaction_date)}
                             </p>
                           </div>
                         </div>
                         <span
-                          className={`font-semibold text-sm ${
-                            transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                          className={`font-black text-sm ${
+                            transaction.type === 'income' ? 'text-emerald-400' : 'text-rose-400'
                           }`}
                         >
                           {transaction.type === 'income' ? '+' : '-'}
@@ -344,38 +345,42 @@ export default function Overview() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8 text-sm">Tranzaksiya yo'q</p>
+                  <p className="text-slate-400 text-center py-10 text-sm">Amal yo'q</p>
                 )}
               </div>
             </div>
 
-            {/* Top Expenses */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Eng ko'p xarajatlar
+            {/* Eng ko'p xarajatlar Panel */}
+            <div className="glass-panel rounded-3xl overflow-hidden border border-teal-500/20 flex flex-col justify-between">
+              <div className="px-6 py-4 border-b border-teal-500/15 flex items-center justify-between">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <FontAwesomeIcon icon={faWandMagicSparkles} className="w-4 h-4 text-cyan-400" />
+                  Eng Ko'p Xarajatlar
                 </h2>
+                <span className="text-xs text-teal-300/60">Kategoriyalar bo'yicha</span>
               </div>
-              <div className="p-6">
+              <div className="p-6 flex-1">
                 {topExpenses && topExpenses.length > 0 ? (
                   <div className="space-y-4">
                     {topExpenses.slice(0, 5).map((item, index) => (
                       <div key={index} className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{item.icon || '💸'}</span>
-                            <span className="font-medium text-gray-900 text-sm">{item.category}</span>
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 bg-teal-950/60 rounded-lg border border-teal-500/20 flex items-center justify-center text-xs font-bold text-cyan-300">
+                              <CategoryIcon name={item.category} icon={item.icon} className="w-3.5 h-3.5 text-cyan-400" />
+                            </div>
+                            <span className="font-semibold text-slate-200 text-sm">{item.category}</span>
                           </div>
-                          <span className="font-semibold text-gray-900 text-sm">
+                          <span className="font-bold text-white text-sm">
                             {formatCurrency(item.total)}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div className="w-full bg-slate-900/60 rounded-full h-2 overflow-hidden border border-teal-500/10">
                           <div
-                            className="h-1.5 rounded-full transition-all"
+                            className="h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(0,242,254,0.5)]"
                             style={{
-                              width: `${(item.total / summary.total_expense) * 100}%`,
-                              backgroundColor: item.color || '#3b82f6',
+                              width: `${Math.min(100, (item.total / summary.total_expense) * 100)}%`,
+                              backgroundColor: item.color || '#00f2fe',
                             }}
                           />
                         </div>
@@ -383,7 +388,7 @@ export default function Overview() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8 text-sm">Ma'lumot yo'q</p>
+                  <p className="text-slate-400 text-center py-10 text-sm">Ma'lumot yo'q</p>
                 )}
               </div>
             </div>

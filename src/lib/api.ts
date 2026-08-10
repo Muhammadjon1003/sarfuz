@@ -4,6 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
 
 export const api = axios.create({
   baseURL: API_URL,
+  timeout: 30000, // 30s timeout for cold start resiliency
 })
 
 export interface Transaction {
@@ -247,6 +248,7 @@ export interface User {
   username?: string
   first_name?: string
   last_name?: string
+  photo_url?: string
   language?: string
   is_active: boolean
   created_at: string

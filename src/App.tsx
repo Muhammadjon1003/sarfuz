@@ -38,6 +38,15 @@ function App() {
         setTelegramId(storedTelegramId)
       }
     }
+
+    // Keep-alive ping to prevent Render free instance from going to sleep during active session
+    const pingBackend = () => {
+      fetch('https://fin-backend-live.onrender.com/health').catch(() => {})
+    }
+    pingBackend()
+    const keepAliveInterval = setInterval(pingBackend, 1000 * 60 * 5) // every 5 minutes
+
+    return () => clearInterval(keepAliveInterval)
   }, [setTelegramId])
 
   if (!telegramId) {

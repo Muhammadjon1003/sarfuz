@@ -1,30 +1,43 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Receipt, TrendingUp, FolderOpen, Menu, X, User, ChevronLeft, ChevronRight, Users, Sparkles } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { 
+  faChartPie, 
+  faReceipt, 
+  faUserGroup, 
+  faArrowTrendUp, 
+  faWandMagicSparkles, 
+  faFolderOpen, 
+  faUser, 
+  faChevronLeft, 
+  faChevronRight,
+  faRightFromBracket,
+  faPlus
+} from '@fortawesome/free-solid-svg-icons'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { getUser } from '@/lib/api'
+import NotificationModal from '@/components/NotificationModal'
+import AddTransactionDialog from '@/components/AddTransactionDialog'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Tranzaksiyalar', href: '/transactions', icon: Receipt },
-  { name: 'Qarzlar', href: '/debts', icon: Users },
-  { name: 'Tahlil', href: '/analytics', icon: TrendingUp },
-  { name: 'Prognoz', href: '/forecasting', icon: Sparkles },
-  { name: 'Kategoriyalar', href: '/categories', icon: FolderOpen },
+  { name: "Boshqaruv bo'limi", href: '/', icon: faChartPie },
+  { name: 'Amallar', href: '/transactions', icon: faReceipt },
+  { name: 'Qarzlar', href: '/debts', icon: faUserGroup },
+  { name: 'Tahlil', href: '/analytics', icon: faArrowTrendUp },
+  { name: 'Prognoz', href: '/forecasting', icon: faWandMagicSparkles },
+  { name: 'Kategoriyalar', href: '/categories', icon: faFolderOpen },
 ]
 
 export default function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    // Load collapsed state from localStorage
     const saved = localStorage.getItem('sidebar-collapsed')
     return saved === 'true'
   })
-  const { telegramId, user, setUser } = useAuthStore()
+  const { telegramId, user, setUser, logout } = useAuthStore()
   const location = useLocation()
 
-  // Fetch user data
   useEffect(() => {
     if (telegramId && !user) {
       getUser(telegramId)
@@ -33,7 +46,6 @@ export default function Layout() {
     }
   }, [telegramId, user, setUser])
 
-  // Get current page name
   const currentPage = navigation.find(item => {
     if (item.href === '/') {
       return location.pathname === '/'
@@ -41,7 +53,6 @@ export default function Layout() {
     return location.pathname.startsWith(item.href)
   })
 
-  // Save collapsed state to localStorage
   const toggleSidebar = () => {
     const newState = !sidebarCollapsed
     setSidebarCollapsed(newState)
@@ -49,168 +60,306 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <div className="min-h-screen text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Background radial ambient lights: Vibrant Top-Left Cyan & Bottom-Right Blackish */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute -top-44 -left-44 w-[42rem] h-[42rem] bg-cyan-400/25 rounded-full blur-[130px]"></div>
+        <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[35rem] h-[35rem] bg-teal-500/10 rounded-full blur-[140px]"></div>
+        <div className="absolute -bottom-44 -right-44 w-[45rem] h-[45rem] bg-black/90 rounded-full blur-[120px]"></div>
+      </div>
 
-      {/* Sidebar */}
-      <div
+      {/* Sidebar (Desktop Only) */}
+      <aside
         className={cn(
-          'fixed inset-y-0 left-0 bg-white border-r border-gray-200 z-50 transform transition-all duration-300 ease-in-out lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          'hidden lg:flex fixed inset-y-0 left-0 bg-[#06181f]/80 backdrop-blur-2xl border-r border-teal-500/15 z-50 flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out',
           sidebarCollapsed ? 'w-20' : 'w-64'
         )}
       >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100">
+        <div>
+          {/* Logo header */}
+          <div className="flex items-center justify-between h-20 px-5 border-b border-teal-500/10">
             {!sidebarCollapsed ? (
-              <>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">FM</span>
-                  </div>
-                  <h1 className="text-lg font-semibold text-gray-900">Finance Manager</h1>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)] border border-cyan-300/30">
+                  <span className="text-slate-950 font-black text-base tracking-wider">FM</span>
                 </div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="lg:hidden text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </>
+                <div>
+                  <h1 className="text-base font-bold bg-gradient-to-r from-white via-cyan-100 to-teal-200 bg-clip-text text-transparent">
+                    Finance Manager
+                  </h1>
+                  <p className="text-[10px] text-teal-400/70 uppercase tracking-widest font-medium">Pro Dashboard</p>
+                </div>
+              </div>
             ) : (
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto">
-                <span className="text-white font-bold text-sm">FM</span>
+              <div className="w-10 h-10 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-xl flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(6,182,212,0.4)] border border-cyan-300/30">
+                <span className="text-slate-950 font-black text-base">FM</span>
               </div>
             )}
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-6 space-y-1">
+          {/* Navigation links */}
+          <nav className="px-3 py-6 space-y-1.5">
             {navigation.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.href}
                 end={item.href === '/'}
-                onClick={() => setSidebarOpen(false)}
                 title={sidebarCollapsed ? item.name : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150',
+                    'flex items-center px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative group',
                     isActive
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
-                    sidebarCollapsed && 'justify-center'
+                      ? 'bg-gradient-to-r from-cyan-500/20 via-teal-500/10 to-transparent text-cyan-300 border-l-2 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-teal-950/40',
+                    sidebarCollapsed && 'justify-center px-0'
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <item.icon className={cn('w-5 h-5', !sidebarCollapsed && 'mr-3', isActive ? 'text-blue-600' : 'text-gray-400')} />
-                    {!sidebarCollapsed && item.name}
+                    <FontAwesomeIcon
+                      icon={item.icon}
+                      className={cn(
+                        'w-5 h-5 transition-transform group-hover:scale-110',
+                        isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-300',
+                        !sidebarCollapsed && 'mr-3'
+                      )}
+                    />
+                    {!sidebarCollapsed && <span>{item.name}</span>}
                   </>
                 )}
               </NavLink>
             ))}
           </nav>
+        </div>
 
-          {/* Collapse Toggle Button - Desktop only */}
-          <div className="hidden lg:block p-3 border-t border-gray-100">
+        {/* Sidebar Footer */}
+        <div>
+          {/* Collapse Toggle */}
+          <div className="hidden lg:block p-3 border-t border-teal-500/10">
             <button
               onClick={toggleSidebar}
-              className="w-full flex items-center justify-center px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center py-2 text-slate-400 hover:text-cyan-300 hover:bg-teal-950/40 rounded-xl transition-colors"
               title={sidebarCollapsed ? "Kengaytirish" : "Yig'ish"}
             >
               {sidebarCollapsed ? (
-                <ChevronRight className="w-5 h-5" />
+                <FontAwesomeIcon icon={faChevronRight} className="w-5 h-5" />
               ) : (
                 <>
-                  <ChevronLeft className="w-5 h-5 mr-2" />
-                  <span className="text-sm font-medium">Yig'ish</span>
+                  <FontAwesomeIcon icon={faChevronLeft} className="w-5 h-5 mr-2" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Yig'ish</span>
                 </>
               )}
             </button>
           </div>
 
           {/* User info */}
-          {!sidebarCollapsed && (
-            <div className="p-4 border-t border-gray-100">
-              <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-blue-600" />
-                </div>
+          <div className="p-3 border-t border-teal-500/10">
+            {!sidebarCollapsed ? (
+              <div className="flex items-center gap-3 p-2.5 bg-teal-950/40 border border-teal-500/15 rounded-xl backdrop-blur-md">
+                {user?.photo_url ? (
+                  <img
+                    src={user.photo_url}
+                    alt={user.first_name || 'Profile'}
+                    className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                  />
+                ) : user?.first_name ? (
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
+                    alt={user.first_name}
+                    className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                  />
+                ) : (
+                  <div className="w-9 h-9 bg-gradient-to-br from-cyan-500/30 to-teal-500/20 border border-cyan-400/30 rounded-lg flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                    <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   {user ? (
                     <>
-                      <p className="text-xs font-medium text-gray-900 truncate">
+                      <p className="text-xs font-semibold text-slate-200 truncate">
                         {user.first_name} {user.last_name}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-[11px] text-cyan-400/70 truncate">
                         @{user.username || telegramId}
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="text-xs font-medium text-gray-900 truncate">Telegram ID</p>
-                      <p className="text-xs text-gray-500 truncate">{telegramId || 'Not set'}</p>
+                      <p className="text-xs font-semibold text-slate-200 truncate">Telegram User</p>
+                      <p className="text-[11px] text-cyan-400/70 truncate">{telegramId || 'Not connected'}</p>
                     </>
                   )}
                 </div>
               </div>
-            </div>
-          )}
-          
-          {/* User icon only when collapsed */}
-          {sidebarCollapsed && (
-            <div className="p-4 border-t border-gray-100">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto" title={user ? `${user.first_name} ${user.last_name}` : telegramId || ''}>
-                <User className="w-5 h-5 text-blue-600" />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className={cn('transition-all duration-300', sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64')}>
-        {/* Top bar */}
-        <div className="sticky top-0 z-30 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-gray-500 hover:text-gray-700"
+            ) : (
+              <div
+                className="w-10 h-10 overflow-hidden border border-cyan-400/30 rounded-xl flex items-center justify-center mx-auto text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] bg-teal-950/60"
+                title={user ? `${user.first_name} ${user.last_name}` : telegramId || ''}
               >
-                <Menu className="w-6 h-6" />
-              </button>
-              
-              {/* Page Title */}
+                {user?.photo_url ? (
+                  <img src={user.photo_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : user?.first_name ? (
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className={cn('transition-all duration-300 relative z-10', sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64')}>
+        {/* Header Bar - Scrolls naturally with page */}
+        <header className="w-full bg-transparent">
+          <div className="flex items-center justify-between min-h-[5rem] py-3 px-4 sm:px-6 lg:px-8 gap-2">
+            <div className="flex items-center gap-3">
+              {/* Page Header Title */}
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center lg:hidden">
-                  <span className="text-white font-bold text-sm">FM</span>
+                <div className="w-9 h-9 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-xl flex items-center justify-center lg:hidden shadow-[0_0_12px_rgba(6,182,212,0.4)]">
+                  <span className="text-slate-950 font-black text-sm">FM</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">{currentPage?.name || 'Dashboard'}</h1>
+                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                    {currentPage?.name || "Boshqaruv bo'limi"}
+                  </h1>
+                  <p className="text-xs text-teal-300/60 hidden sm:block">Real-vaqt rejimida moliyaviy nazorat</p>
                 </div>
               </div>
             </div>
             
-            {/* Right side - will be filled by page content */}
-            <div id="page-actions"></div>
+            {/* Header Right Actions */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div id="page-actions" className="flex items-center gap-2 sm:gap-3"></div>
+              <NotificationModal />
+              
+              {/* Logout Button */}
+              <button
+                onClick={() => {
+                  if (confirm("Hisobdan chiqmoqchimisiz?")) {
+                    logout()
+                  }
+                }}
+                className="p-2.5 rounded-xl bg-teal-950/40 border border-teal-500/20 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 transition-all group"
+                title="Hisobdan chiqish"
+              >
+                <FontAwesomeIcon icon={faRightFromBracket} className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
           </div>
-        </div>
+        </header>
 
-        {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8">
+        {/* Page Content Rendered Here */}
+        <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto pb-24 lg:pb-8">
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile & Tablet Bottom Navigation Bar (All Sections + Center Floating Plus Button) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#06181f]/95 backdrop-blur-2xl border-t border-teal-500/20 px-2 py-1.5 flex items-center justify-around shadow-[0_-10px_30px_rgba(0,0,0,0.6)] lg:hidden">
+        {/* Boshqaruv bo'limi */}
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
+            )
+          }
+          title="Boshqaruv bo'limi"
+        >
+          <FontAwesomeIcon icon={faChartPie} className="w-4 h-4 sm:w-5 sm:h-5" />
+        </NavLink>
+
+        {/* Amallar */}
+        <NavLink
+          to="/transactions"
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
+            )
+          }
+          title="Amallar"
+        >
+          <FontAwesomeIcon icon={faReceipt} className="w-4 h-4 sm:w-5 sm:h-5" />
+        </NavLink>
+
+        {/* Qarzlar */}
+        <NavLink
+          to="/debts"
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
+            )
+          }
+          title="Qarzlar"
+        >
+          <FontAwesomeIcon icon={faUserGroup} className="w-4 h-4 sm:w-5 sm:h-5" />
+        </NavLink>
+
+        {/* Center Floating Plus Action Button (Yangi Amal) */}
+        <button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="relative -top-3 sm:-top-4 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 flex items-center justify-center text-slate-950 shadow-[0_0_20px_rgba(0,242,254,0.6)] border border-cyan-200/50 hover:scale-105 active:scale-95 transition-all flex-shrink-0"
+          title="Yangi Amal Qo'shish"
+        >
+          <FontAwesomeIcon icon={faPlus} className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2]" />
+        </button>
+
+        {/* Tahlil */}
+        <NavLink
+          to="/analytics"
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
+            )
+          }
+          title="Tahlil"
+        >
+          <FontAwesomeIcon icon={faArrowTrendUp} className="w-4 h-4 sm:w-5 sm:h-5" />
+        </NavLink>
+
+        {/* Prognoz */}
+        <NavLink
+          to="/forecasting"
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
+            )
+          }
+          title="Prognoz"
+        >
+          <FontAwesomeIcon icon={faWandMagicSparkles} className="w-4 h-4 sm:w-5 sm:h-5" />
+        </NavLink>
+
+        {/* Kategoriyalar */}
+        <NavLink
+          to="/categories"
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
+            )
+          }
+          title="Kategoriyalar"
+        >
+          <FontAwesomeIcon icon={faFolderOpen} className="w-4 h-4 sm:w-5 sm:h-5" />
+        </NavLink>
+      </nav>
+
+      {/* Add Transaction Dialog (Triggered globally via mobile bottom + button) */}
+      <AddTransactionDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
     </div>
   )
 }

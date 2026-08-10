@@ -50,6 +50,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        darkBg: "#051318",
+        darkSurface: "#091e25",
+        tealGlass: "rgba(10, 32, 40, 0.65)",
+        tealGlassBorder: "rgba(20, 184, 166, 0.18)",
+        cyanGlow: "#00f2fe",
+      },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.08)',
+        'glass-hover': '0 12px 40px 0 rgba(0, 242, 254, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
+        'cyan-glow': '0 0 20px rgba(0, 242, 254, 0.35)',
       },
       borderRadius: {
         lg: "var(--radius)",
