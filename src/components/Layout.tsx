@@ -10,7 +10,6 @@ import {
   faUser, 
   faChevronLeft, 
   faChevronRight,
-  faRightFromBracket,
   faPlus
 } from '@fortawesome/free-solid-svg-icons'
 import { cn } from '@/lib/utils'
@@ -19,6 +18,7 @@ import { useAuthStore } from '@/store/authStore'
 import { getUser } from '@/lib/api'
 import NotificationModal from '@/components/NotificationModal'
 import AddTransactionDialog from '@/components/AddTransactionDialog'
+import ProfileDropdownMenu from '@/components/ProfileDropdownMenu'
 import logoDark from '@/assets/logo-dark.png'
 
 const navigation = [
@@ -36,7 +36,7 @@ export default function Layout() {
     const saved = localStorage.getItem('sidebar-collapsed')
     return saved === 'true'
   })
-  const { telegramId, user, setUser, logout } = useAuthStore()
+  const { telegramId, user, setUser } = useAuthStore()
   const location = useLocation()
 
   useEffect(() => {
@@ -242,19 +242,7 @@ export default function Layout() {
             <div className="flex items-center gap-2 sm:gap-3">
               <div id="page-actions" className="flex items-center gap-2 sm:gap-3"></div>
               <NotificationModal />
-              
-              {/* Logout Button */}
-              <button
-                onClick={() => {
-                  if (confirm("Hisobdan chiqmoqchimisiz?")) {
-                    logout()
-                  }
-                }}
-                className="p-2.5 rounded-xl bg-teal-950/40 border border-teal-500/20 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 transition-all group"
-                title="Hisobdan chiqish"
-              >
-                <FontAwesomeIcon icon={faRightFromBracket} className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              </button>
+              <ProfileDropdownMenu />
             </div>
           </div>
         </header>

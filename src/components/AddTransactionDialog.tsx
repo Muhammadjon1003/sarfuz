@@ -73,8 +73,8 @@ export default function AddTransactionDialog({ open, onOpenChange, editTransacti
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md sm:flex sm:items-center sm:justify-center z-50 p-0 sm:p-4 animate-in fade-in duration-200">
-      <div className="w-full h-full sm:h-auto sm:max-w-md sm:w-full max-h-none sm:max-h-[90vh] bg-[#040e12] sm:glass-panel rounded-none sm:rounded-3xl border-0 sm:border sm:border-teal-500/30 overflow-y-auto shadow-2xl relative flex flex-col">
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div className="glass-panel rounded-3xl border border-teal-500/30 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
         <div className="flex items-center justify-between p-6 border-b border-teal-500/15 bg-teal-950/30">
           <h2 className="text-xl font-extrabold text-white flex items-center gap-3">
             <div className="p-2 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300">
