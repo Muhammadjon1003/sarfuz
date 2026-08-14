@@ -11,7 +11,11 @@ import {
   faBolt
 } from '@fortawesome/free-solid-svg-icons'
 
-export default function ProfileDropdownMenu() {
+interface Props {
+  sidebarCollapsed?: boolean
+}
+
+export default function ProfileDropdownMenu({ sidebarCollapsed = false }: Props) {
   const { user, telegramId, logout } = useAuthStore()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -32,46 +36,80 @@ export default function ProfileDropdownMenu() {
   }, [isOpen])
 
   return (
-    <div className="relative" ref={menuRef}>
-      {/* Profile Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1.5 rounded-xl bg-teal-950/40 border border-teal-500/20 hover:border-cyan-400/40 hover:bg-teal-900/30 transition-all group"
-        title="Profil Menyusi"
-      >
-        {user?.photo_url ? (
-          <img
-            src={user.photo_url}
-            alt={user.first_name || 'Profile'}
-            className="w-8 h-8 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
-          />
-        ) : user?.first_name ? (
-          <img
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
-            alt={user.first_name}
-            className="w-8 h-8 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
-          />
-        ) : (
-          <div className="w-8 h-8 bg-gradient-to-br from-cyan-500/30 to-teal-500/20 border border-cyan-400/30 rounded-lg flex items-center justify-center text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.2)]">
-            <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+    <div className="relative w-full" ref={menuRef}>
+      {/* Profile Trigger Button inside Sidebar */}
+      {!sidebarCollapsed ? (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center gap-3 p-2.5 bg-teal-950/40 border border-teal-500/15 rounded-xl hover:border-cyan-400/40 hover:bg-teal-900/30 transition-all text-left group"
+          title="Foydalanuvchi Profili"
+        >
+          {user?.photo_url ? (
+            <img
+              src={user.photo_url}
+              alt={user.first_name || 'Profile'}
+              className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)] group-hover:scale-105 transition-transform"
+            />
+          ) : user?.first_name ? (
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
+              alt={user.first_name}
+              className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)] group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <div className="w-9 h-9 bg-gradient-to-br from-cyan-500/30 to-teal-500/20 border border-cyan-400/30 rounded-lg flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+              <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            {user ? (
+              <>
+                <p className="text-xs font-semibold text-slate-200 truncate">
+                  {user.first_name} {user.last_name || ''}
+                </p>
+                <p className="text-[11px] text-cyan-400/70 truncate">
+                  @{user.username || telegramId}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-xs font-semibold text-slate-200 truncate">Telegram User</p>
+                <p className="text-[11px] text-cyan-400/70 truncate">{telegramId || 'Not connected'}</p>
+              </>
+            )}
           </div>
-        )}
-        <span className="text-xs font-bold text-slate-200 hidden md:inline truncate max-w-[100px]">
-          {user?.first_name || 'Profil'}
-        </span>
-      </button>
+        </button>
+      ) : (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-10 h-10 overflow-hidden border border-cyan-400/30 hover:border-cyan-400/60 rounded-xl flex items-center justify-center mx-auto text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] bg-teal-950/60 transition-all"
+          title={user ? `${user.first_name} ${user.last_name || ''}` : telegramId || ''}
+        >
+          {user?.photo_url ? (
+            <img src={user.photo_url} alt="Profile" className="w-full h-full object-cover" />
+          ) : user?.first_name ? (
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
+          )}
+        </button>
+      )}
 
-      {/* Mobile Full Backdrop Overlay */}
+      {/* Mobile Backdrop Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 sm:hidden bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-40 lg:hidden bg-black/60 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Adaptive Profile Container: Full-Screen Page on Mobile (< sm), Centered Modal on Desktop (sm:) */}
+      {/* Adaptive Profile Container: Full-Screen Page on Mobile (< lg), Sidebar Popover Modal on Desktop (lg:) */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-[#040e12] sm:bg-transparent sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-3 sm:w-80 w-full h-full sm:h-auto glass-panel-modal rounded-none sm:rounded-3xl border-0 sm:border sm:border-teal-500/30 shadow-2xl p-6 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200 flex flex-col justify-between sm:justify-start">
+        <div className="fixed inset-0 z-50 bg-[#040e12] lg:bg-transparent lg:absolute lg:inset-auto lg:bottom-0 lg:left-full lg:ml-3 lg:w-80 w-full h-full lg:h-auto glass-panel-modal rounded-none lg:rounded-3xl border-0 lg:border lg:border-teal-500/30 shadow-2xl p-6 overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-200 flex flex-col justify-between lg:justify-start">
           <div>
             {/* Header / Top Bar */}
             <div className="flex items-center justify-between pb-4 border-b border-teal-500/15">
