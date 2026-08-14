@@ -91,7 +91,7 @@ export default function StackedCards({
           {cardsData.map((card) => (
             <div
               key={card.id}
-              className={`w-[85%] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-center h-[180px] rounded-3xl p-5 flex flex-col justify-between overflow-hidden backdrop-blur-2xl border ${card.bgClass} relative`}
+              className={`w-[85%] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-center h-[180px] rounded-3xl p-5 flex flex-col justify-between overflow-hidden backdrop-blur-2xl border ${card.bgClass} relative force-text-white`}
             >
               {/* Ambient blur */}
               <div className={`absolute -right-12 -bottom-12 w-44 h-44 ${card.glowColor} rounded-full blur-2xl pointer-events-none`}></div>
@@ -187,7 +187,7 @@ export default function StackedCards({
                   transform: `translateY(${translateY}px) scale(${scale})`,
                   transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.4s ease, z-index 0.2s ease, opacity 0.3s ease',
                 }}
-                className={`absolute h-[180px] rounded-3xl p-5 flex flex-col justify-between overflow-hidden backdrop-blur-2xl transition-all cursor-pointer ${card.bgClass}`}
+                className={`absolute h-[180px] rounded-3xl p-5 flex flex-col justify-between overflow-hidden backdrop-blur-2xl transition-all cursor-pointer ${card.bgClass} force-text-white`}
               >
                 <div className={`absolute -right-12 -bottom-12 w-48 h-48 ${card.glowColor} rounded-full blur-2xl pointer-events-none transition-transform duration-500`}></div>
 

@@ -57,8 +57,14 @@
   body.light label {
     color: #0e4a56; /* Dark Cyan 900 */
   }
-  body.light .text-white {
+  body.light .text-white:not(.force-text-white) {
     color: #083344 !important;
+  }
+  .force-text-white,
+  .force-text-white *,
+  body.light .force-text-white,
+  body.light .force-text-white * {
+    color: #ffffff !important;
   }
   body.light .text-slate-100,
   body.light .text-slate-200,
