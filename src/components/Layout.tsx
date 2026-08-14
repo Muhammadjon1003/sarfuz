@@ -5,8 +5,6 @@ import {
   faReceipt, 
   faArrowTrendUp, 
   faUser,
-  faChevronLeft, 
-  faChevronRight,
   faPlus
 } from '@fortawesome/free-solid-svg-icons'
 import { cn } from '@/lib/utils'
@@ -15,13 +13,13 @@ import { useAuthStore } from '@/store/authStore'
 import { getUser } from '@/lib/api'
 import NotificationModal from '@/components/NotificationModal'
 import AddTransactionDialog from '@/components/AddTransactionDialog'
+import Sidebar from '@/components/Sidebar'
 import logoDark from '@/assets/logo-dark.png'
 
 const navigation = [
   { name: "Boshqaruv bo'limi", href: '/', icon: faChartPie },
   { name: 'Amallar', href: '/transactions', icon: faReceipt },
   { name: 'Tahlil', href: '/analytics', icon: faArrowTrendUp },
-  { name: 'Profil', href: '/profile', icon: faUser },
 ]
 
 export default function Layout() {
@@ -49,7 +47,9 @@ export default function Layout() {
     localStorage.setItem('sidebar-collapsed', String(nextState))
   }
 
-  const currentPage = navigation.find((item) => item.href === location.pathname)
+  const currentPageName = location.pathname === '/profile' 
+    ? 'Profil' 
+    : navigation.find((item) => item.href === location.pathname)?.name || "Boshqaruv bo'limi"
 
   return (
     <div className="min-h-screen bg-[#040e12] text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
@@ -60,166 +60,14 @@ export default function Layout() {
         <div className="absolute -bottom-44 -right-44 w-[45rem] h-[45rem] bg-black/90 rounded-full blur-[120px]"></div>
       </div>
 
-      {/* Sidebar (Desktop Only) */}
-      <aside
-        className={cn(
-          'hidden lg:flex fixed inset-y-0 left-0 bg-[#06181f]/80 backdrop-blur-2xl border-r border-teal-500/15 z-50 flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out',
-          sidebarCollapsed ? 'w-20' : 'w-64'
-        )}
-      >
-        <div>
-          {/* Logo header */}
-          <div className="flex items-center justify-between h-20 px-5 border-b border-teal-500/10">
-            {!sidebarCollapsed ? (
-              <div className="flex items-center gap-3">
-                <img
-                  src={logoDark}
-                  alt="SARF"
-                  className="w-10 h-10 rounded-xl object-cover border border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                />
-                <div>
-                  <h1 className="text-lg font-black tracking-wider bg-gradient-to-r from-white via-cyan-100 to-teal-200 bg-clip-text text-transparent uppercase">
-                    SARF
-                  </h1>
-                  <p className="text-[10px] text-teal-400/70 uppercase tracking-widest font-semibold">Biznes Moliya</p>
-                </div>
-              </div>
-            ) : (
-              <img
-                src={logoDark}
-                alt="SARF"
-                className="w-10 h-10 rounded-xl object-cover mx-auto border border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-              />
-            )}
-          </div>
-
-          {/* Navigation links */}
-          <nav className="px-3 py-6 space-y-1.5">
-            {navigation.map((item) => (
-              <NavLink
-                key={item.name}
-                to={item.href}
-                end={item.href === '/'}
-                title={sidebarCollapsed ? item.name : undefined}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative group',
-                    isActive
-                      ? 'bg-gradient-to-r from-cyan-500/20 via-teal-500/10 to-transparent text-cyan-300 border-l-2 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-teal-950/40',
-                    sidebarCollapsed && 'justify-center px-0'
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <FontAwesomeIcon
-                      icon={item.icon}
-                      className={cn(
-                        'w-5 h-5 transition-transform group-hover:scale-110',
-                        isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-300',
-                        !sidebarCollapsed && 'mr-3'
-                      )}
-                    />
-                    {!sidebarCollapsed && <span>{item.name}</span>}
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-
-        {/* Sidebar Footer */}
-        <div>
-          {/* Collapse Toggle */}
-          <div className="hidden lg:block p-3 border-t border-teal-500/10">
-            <button
-              onClick={toggleSidebar}
-              className="w-full flex items-center justify-center py-2 text-slate-400 hover:text-cyan-300 hover:bg-teal-950/40 rounded-xl transition-colors"
-              title={sidebarCollapsed ? "Kengaytirish" : "Yig'ish"}
-            >
-              {sidebarCollapsed ? (
-                <FontAwesomeIcon icon={faChevronRight} className="w-5 h-5" />
-              ) : (
-                <>
-                  <FontAwesomeIcon icon={faChevronLeft} className="w-5 h-5 mr-2" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Yig'ish</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* User info Link to Profile Page */}
-          <div className="p-3 border-t border-teal-500/10">
-            <NavLink
-              to="/profile"
-              title={sidebarCollapsed ? (user ? `${user.first_name} ${user.last_name || ''}` : telegramId || '') : undefined}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 border',
-                  isActive
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                    : 'bg-teal-950/40 text-slate-300 border-teal-500/15 hover:border-cyan-400/30 hover:bg-teal-900/30',
-                  sidebarCollapsed && 'justify-center p-2'
-                )
-              }
-            >
-              {!sidebarCollapsed ? (
-                <>
-                  {user?.photo_url ? (
-                    <img
-                      src={user.photo_url}
-                      alt={user.first_name || 'Profile'}
-                      className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)] flex-shrink-0"
-                    />
-                  ) : user?.first_name ? (
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
-                      alt={user.first_name}
-                      className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)] flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 bg-gradient-to-br from-cyan-500/30 to-teal-500/20 border border-cyan-400/30 rounded-lg flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] flex-shrink-0">
-                      <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    {user ? (
-                      <>
-                        <p className="text-xs font-semibold text-slate-200 truncate">
-                          {user.first_name} {user.last_name || ''}
-                        </p>
-                        <p className="text-[11px] text-cyan-400/70 truncate">
-                          @{user.username || telegramId}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-xs font-semibold text-slate-200 truncate">Telegram User</p>
-                        <p className="text-[11px] text-cyan-400/70 truncate">{telegramId || 'Not connected'}</p>
-                      </>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <div className="w-9 h-9 overflow-hidden border border-cyan-400/30 rounded-xl flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] bg-teal-950/60">
-                  {user?.photo_url ? (
-                    <img src={user.photo_url} alt="Profile" className="w-full h-full object-cover" />
-                  ) : user?.first_name ? (
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
-                  )}
-                </div>
-              )}
-            </NavLink>
-          </div>
-        </div>
-      </aside>
+      {/* Separate Desktop Sidebar Component */}
+      <Sidebar
+        sidebarCollapsed={sidebarCollapsed}
+        toggleSidebar={toggleSidebar}
+        navigation={navigation}
+        user={user}
+        telegramId={telegramId}
+      />
 
       {/* Main Content Area */}
       <div className={cn('transition-all duration-300 relative z-10', sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64')}>
@@ -236,7 +84,7 @@ export default function Layout() {
                 />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                    {currentPage?.name || "Boshqaruv bo'limi"}
+                    {currentPageName}
                   </h1>
                   <p className="text-xs text-teal-300/60 hidden sm:block">Real-vaqt rejimida moliyaviy nazorat</p>
                 </div>
