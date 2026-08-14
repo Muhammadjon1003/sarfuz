@@ -63,7 +63,7 @@ export default function Debts() {
         createPortal(
           <button
             onClick={() => setIsAddDialogOpen(true)}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-300 hover:to-cyan-300 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-[0_0_15px_rgba(0,242,254,0.3)]"
+            className="btn-bluish flex items-center gap-1.5 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-300 hover:to-cyan-300 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-[0_0_15px_rgba(0,242,254,0.3)]"
           >
             <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Qarz qo'shish</span>

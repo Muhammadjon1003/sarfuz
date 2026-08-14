@@ -180,7 +180,7 @@ export default function AddTransactionDialog({ open, onOpenChange, editTransacti
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="w-full bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 hover:from-teal-300 hover:to-sky-300 text-slate-950 font-black py-3.5 px-4 rounded-xl text-sm shadow-[0_0_20px_rgba(0,242,254,0.3)] transition-all disabled:opacity-50"
+            className="w-full btn-bluish bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 hover:from-teal-300 hover:to-sky-300 text-slate-950 font-black py-3.5 px-4 rounded-xl text-sm shadow-[0_0_20px_rgba(0,242,254,0.3)] transition-all disabled:opacity-50"
           >
             {mutation.isPending ? 'Saqlanmoqda...' : editTransaction ? "O'zgarishlarni Saqlash" : 'Amalni Saqlash'}
           </button>
