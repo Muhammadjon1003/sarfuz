@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
 import { getForecastWarnings, getOverdueDebts } from '@/lib/api'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, cn } from '@/lib/utils'
+import { useThemeStore } from '@/store/themeStore'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faBell,
@@ -12,6 +13,7 @@ import {
 
 export default function NotificationModal() {
   const { telegramId } = useAuthStore()
+  const { theme } = useThemeStore()
   const [isOpen, setIsOpen] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
 
@@ -54,7 +56,12 @@ export default function NotificationModal() {
       {/* Bell Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2.5 rounded-xl bg-teal-950/40 border border-teal-500/20 text-slate-300 hover:text-cyan-300 hover:border-cyan-400/40 transition-all group"
+        className={cn(
+          'relative p-2.5 rounded-xl border transition-all group flex items-center justify-center',
+          theme === 'dark'
+            ? 'bg-teal-950/40 border-teal-500/20 text-slate-300 hover:text-cyan-300 hover:border-cyan-400/40'
+            : 'bg-white/80 border-cyan-400/40 text-slate-700 hover:text-cyan-600 hover:border-cyan-500 hover:bg-cyan-50 shadow-sm'
+        )}
         title="Bildirishnomalar"
       >
         <FontAwesomeIcon icon={faBell} className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
@@ -85,7 +92,9 @@ export default function NotificationModal() {
           {/* Header */}
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-teal-500/15">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-white text-sm">Bildirishnomalar</h3>
+              <h3 className={cn("font-bold text-sm", theme === 'dark' ? "text-white" : "text-slate-900")}>
+                Bildirishnomalar
+              </h3>
               {totalNotifications > 0 && (
                 <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-[10px] font-bold text-cyan-300">
                   {totalNotifications} ta yangi
