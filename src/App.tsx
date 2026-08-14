@@ -8,6 +8,7 @@ import Analytics from './pages/Analytics'
 import Categories from './pages/Categories'
 import Debts from './pages/Debts'
 import Forecasting from './pages/Forecasting'
+import Profile from './pages/Profile'
 import Onboarding from './pages/Onboarding'
 import { initTelegramMiniApp, getTelegramUser, applyTelegramTheme, isTelegramMiniApp } from './lib/telegram'
 
@@ -63,6 +64,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="forecasting" element={<Forecasting />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

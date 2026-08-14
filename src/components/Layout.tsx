@@ -7,6 +7,7 @@ import {
   faArrowTrendUp, 
   faWandMagicSparkles, 
   faFolderOpen, 
+  faUser,
   faChevronLeft, 
   faChevronRight,
   faPlus
@@ -17,7 +18,6 @@ import { useAuthStore } from '@/store/authStore'
 import { getUser } from '@/lib/api'
 import NotificationModal from '@/components/NotificationModal'
 import AddTransactionDialog from '@/components/AddTransactionDialog'
-import ProfileDropdownMenu from '@/components/ProfileDropdownMenu'
 import logoDark from '@/assets/logo-dark.png'
 
 const navigation = [
@@ -27,6 +27,7 @@ const navigation = [
   { name: 'Tahlil', href: '/analytics', icon: faArrowTrendUp },
   { name: 'Prognoz', href: '/forecasting', icon: faWandMagicSparkles },
   { name: 'Kategoriyalar', href: '/categories', icon: faFolderOpen },
+  { name: 'Profil', href: '/profile', icon: faUser },
 ]
 
 export default function Layout() {
@@ -154,9 +155,74 @@ export default function Layout() {
             </button>
           </div>
 
-          {/* User info & Profile Dropdown */}
+          {/* User info Link to Profile Page */}
           <div className="p-3 border-t border-teal-500/10">
-            <ProfileDropdownMenu sidebarCollapsed={sidebarCollapsed} />
+            <NavLink
+              to="/profile"
+              title={sidebarCollapsed ? (user ? `${user.first_name} ${user.last_name || ''}` : telegramId || '') : undefined}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 border',
+                  isActive
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                    : 'bg-teal-950/40 text-slate-300 border-teal-500/15 hover:border-cyan-400/30 hover:bg-teal-900/30',
+                  sidebarCollapsed && 'justify-center p-2'
+                )
+              }
+            >
+              {!sidebarCollapsed ? (
+                <>
+                  {user?.photo_url ? (
+                    <img
+                      src={user.photo_url}
+                      alt={user.first_name || 'Profile'}
+                      className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)] flex-shrink-0"
+                    />
+                  ) : user?.first_name ? (
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
+                      alt={user.first_name}
+                      className="w-9 h-9 rounded-lg object-cover border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)] flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 bg-gradient-to-br from-cyan-500/30 to-teal-500/20 border border-cyan-400/30 rounded-lg flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] flex-shrink-0">
+                      <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    {user ? (
+                      <>
+                        <p className="text-xs font-semibold text-slate-200 truncate">
+                          {user.first_name} {user.last_name || ''}
+                        </p>
+                        <p className="text-[11px] text-cyan-400/70 truncate">
+                          @{user.username || telegramId}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xs font-semibold text-slate-200 truncate">Telegram User</p>
+                        <p className="text-[11px] text-cyan-400/70 truncate">{telegramId || 'Not connected'}</p>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="w-9 h-9 overflow-hidden border border-cyan-400/30 rounded-xl flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] bg-teal-950/60">
+                  {user?.photo_url ? (
+                    <img src={user.photo_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : user?.first_name ? (
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name + ' ' + (user.last_name || ''))}&background=06b6d4&color=ffffff&bold=true`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                  )}
+                </div>
+              )}
+            </NavLink>
           </div>
         </div>
       </aside>
