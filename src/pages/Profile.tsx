@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
+import { useThemeStore } from '@/store/themeStore'
 import { getSummary } from '@/lib/api'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, cn } from '@/lib/utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faUser,
@@ -14,12 +15,16 @@ import {
   faUserGroup,
   faWandMagicSparkles,
   faFolderOpen,
-  faChevronRight
+  faChevronRight,
+  faSun,
+  faMoon,
+  faDesktop
 } from '@fortawesome/free-solid-svg-icons'
 import Loader from '@/components/Loader'
 
 export default function Profile() {
   const { user, telegramId, logout } = useAuthStore()
+  const { theme, setTheme } = useThemeStore()
 
   const { data: summary, isLoading } = useQuery({
     queryKey: ['summary', telegramId],
@@ -182,6 +187,94 @@ export default function Profile() {
           ))}
         </div>
       </div>
+
+      {/* Mavzu Sozlamalari (Theme Settings) Section */}
+      <div className="space-y-4 pt-2">
+        <h2 className="text-lg font-extrabold text-white flex items-center gap-2 border-b border-teal-500/15 pb-3">
+          Mavzu Sozlamalari (Theme Settings)
+        </h2>
+
+        <div className="glass-panel p-6 rounded-3xl border border-teal-500/20 space-y-4">
+          <p className="text-xs text-slate-400">
+            Dastur interfeysi uchun doimiy rejimni tanlang. Tanlangan sozlama saqlanadi.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* 1. Light Mode */}
+            <button
+              onClick={() => setTheme('light')}
+              className={cn(
+                "flex items-center justify-between p-4 rounded-2xl border transition-all text-left group",
+                theme === 'light'
+                  ? "bg-cyan-500/15 border-cyan-400/50 shadow-[0_0_20px_rgba(6,182,212,0.25)] text-cyan-300"
+                  : "bg-teal-950/30 border-teal-500/20 text-slate-400 hover:border-cyan-400/30"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-400">
+                  <FontAwesomeIcon icon={faSun} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white group-hover:text-cyan-300">Yorug' rejim</h4>
+                  <p className="text-[10px] text-slate-400">Default (Oq fon)</p>
+                </div>
+              </div>
+              {theme === 'light' && (
+                <div className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></div>
+              )}
+            </button>
+
+            {/* 2. Dark Mode */}
+            <button
+              onClick={() => setTheme('dark')}
+              className={cn(
+                "flex items-center justify-between p-4 rounded-2xl border transition-all text-left group",
+                theme === 'dark'
+                  ? "bg-cyan-500/15 border-cyan-400/50 shadow-[0_0_20px_rgba(6,182,212,0.25)] text-cyan-300"
+                  : "bg-teal-950/30 border-teal-500/20 text-slate-400 hover:border-cyan-400/30"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300">
+                  <FontAwesomeIcon icon={faMoon} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white group-hover:text-cyan-300">Qorong'u rejim</h4>
+                  <p className="text-[10px] text-slate-400">Deep Cyber Cyan</p>
+                </div>
+              </div>
+              {theme === 'dark' && (
+                <div className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></div>
+              )}
+            </button>
+
+            {/* 3. System Mode */}
+            <button
+              onClick={() => setTheme('system')}
+              className={cn(
+                "flex items-center justify-between p-4 rounded-2xl border transition-all text-left group",
+                theme === 'system'
+                  ? "bg-cyan-500/15 border-cyan-400/50 shadow-[0_0_20px_rgba(6,182,212,0.25)] text-cyan-300"
+                  : "bg-teal-950/30 border-teal-500/20 text-slate-400 hover:border-cyan-400/30"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-purple-500/15 border border-purple-400/30 text-purple-300">
+                  <FontAwesomeIcon icon={faDesktop} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white group-hover:text-cyan-300">Tizim rejimi</h4>
+                  <p className="text-[10px] text-slate-400">Brauzer/OS rejimi</p>
+                </div>
+              </div>
+              {theme === 'system' && (
+                <div className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></div>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
+

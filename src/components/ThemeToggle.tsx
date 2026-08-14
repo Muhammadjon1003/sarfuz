@@ -1,38 +1,46 @@
 import { useEffect } from 'react'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore, applyThemeToBody } from '@/store/themeStore'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons'
+import { faSun, faMoon, faDesktop } from '@fortawesome/free-solid-svg-icons'
 import { cn } from '@/lib/utils'
 
 export default function ThemeToggle() {
-  const { theme, toggleTheme } = useThemeStore()
+  const { theme, toggleTheme, getEffectiveTheme } = useThemeStore()
+  const effectiveTheme = getEffectiveTheme()
 
   useEffect(() => {
-    const root = document.body
-    if (theme === 'light') {
-      root.classList.remove('dark')
-      root.classList.add('light')
-    } else {
-      root.classList.remove('light')
-      root.classList.add('dark')
-    }
+    applyThemeToBody(theme)
   }, [theme])
+
+  const getIcon = () => {
+    if (theme === 'system') return faDesktop
+    return effectiveTheme === 'dark' ? faSun : faMoon
+  }
+
+  const getTitle = () => {
+    if (theme === 'light') return "Hozirgi rejim: Yorug' (Light). Bosing: Qorong'u rejim"
+    if (theme === 'dark') return "Hozirgi rejim: Qorong'u (Dark). Bosing: Tizim rejimi"
+    return "Hozirgi rejim: Tizim (System). Bosing: Yorug' rejim"
+  }
 
   return (
     <button
       onClick={toggleTheme}
       className={cn(
-        'p-2.5 rounded-xl transition-all duration-300 border flex items-center justify-center group',
-        theme === 'dark'
+        'p-2.5 rounded-xl transition-all duration-300 border flex items-center justify-center group relative',
+        effectiveTheme === 'dark'
           ? 'bg-teal-950/40 border-teal-500/20 text-cyan-300 hover:border-cyan-400/40 hover:bg-teal-900/30'
           : 'bg-white/80 border-cyan-400/40 text-cyan-600 hover:border-cyan-500 hover:bg-cyan-50 shadow-sm'
       )}
-      title={theme === 'dark' ? "Yorug' rejimga o'tish (Light Mode)" : "Qorong'u rejimga o'tish (Dark Mode)"}
+      title={getTitle()}
     >
       <FontAwesomeIcon
-        icon={theme === 'dark' ? faSun : faMoon}
-        className="w-4 h-4 group-hover:rotate-45 transition-transform duration-300"
+        icon={getIcon()}
+        className="w-4 h-4 group-hover:scale-110 transition-transform duration-300"
       />
+      {theme === 'system' && (
+        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-cyan-400"></span>
+      )}
     </button>
   )
 }
