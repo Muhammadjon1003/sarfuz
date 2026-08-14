@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShieldHalved, faWandMagicSparkles, faWallet } from '@fortawesome/free-solid-svg-icons'
+import { useThemeStore } from '@/store/themeStore'
 
 interface StackedCardsProps {
   netBalance: number
@@ -15,9 +16,12 @@ export default function StackedCards({
   totalIncome,
   formatCurrency,
 }: StackedCardsProps) {
+  const { theme } = useThemeStore()
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [activeCard, setActiveCard] = useState<number>(0)
   const [mobileActiveIndex, setMobileActiveIndex] = useState(0)
+
+  const isLight = theme === 'light'
 
   const cardsData = [
     {
@@ -27,10 +31,12 @@ export default function StackedCards({
       badge: 'CORPORATE',
       amount: netBalance,
       icon: faWallet,
-      bgClass: 'glass-card-gradient border-cyan-300/40 hover:border-cyan-200 shadow-[0_16px_40px_rgba(0,242,254,0.25)]',
-      glowColor: 'bg-cyan-400/30',
-      badgeBg: 'bg-cyan-500/20 text-cyan-200 border-cyan-300/40',
-      textColor: 'text-cyan-300',
+      bgClass: isLight
+        ? 'bg-gradient-to-tr from-cyan-600 via-sky-600 to-blue-600 border-cyan-300/60 shadow-[0_14px_35px_rgba(2,132,199,0.35)]'
+        : 'glass-card-gradient border-cyan-300/40 hover:border-cyan-200 shadow-[0_16px_40px_rgba(0,242,254,0.25)]',
+      glowColor: isLight ? 'bg-cyan-300/40' : 'bg-cyan-400/30',
+      badgeBg: isLight ? 'bg-white/20 text-white border-white/40 font-bold' : 'bg-cyan-500/20 text-cyan-200 border-cyan-300/40',
+      textColor: 'text-white',
     },
     {
       id: 1,
@@ -39,22 +45,26 @@ export default function StackedCards({
       badge: 'EXPENSE',
       amount: totalExpense,
       icon: faWandMagicSparkles,
-      bgClass: 'bg-gradient-to-tr from-[#2a1352]/90 via-[#4c1d95]/80 to-[#1e1b4b]/95 backdrop-blur-2xl border-purple-400/40 hover:border-purple-300 shadow-[0_16px_40px_rgba(168,85,247,0.3)]',
-      glowColor: 'bg-purple-400/30',
-      badgeBg: 'bg-purple-500/20 text-purple-200 border-purple-300/40',
-      textColor: 'text-purple-300',
+      bgClass: isLight
+        ? 'bg-gradient-to-tr from-rose-500 via-pink-600 to-purple-600 border-rose-300/60 shadow-[0_14px_35px_rgba(225,29,72,0.3)]'
+        : 'bg-gradient-to-tr from-[#2a1352]/90 via-[#4c1d95]/80 to-[#1e1b4b]/95 backdrop-blur-2xl border-purple-400/40 hover:border-purple-300 shadow-[0_16px_40px_rgba(168,85,247,0.3)]',
+      glowColor: isLight ? 'bg-pink-300/40' : 'bg-purple-400/30',
+      badgeBg: isLight ? 'bg-white/20 text-white border-white/40 font-bold' : 'bg-purple-500/20 text-purple-200 border-purple-300/40',
+      textColor: 'text-white',
     },
     {
       id: 2,
       title: 'Jami Daromadlar',
-      subtitle: 'Jamg\'arma Qoldig\'i',
+      subtitle: "Jamg'arma Qoldig'i",
       badge: 'INCOME',
       amount: totalIncome,
       icon: faShieldHalved,
-      bgClass: 'bg-gradient-to-tr from-[#022c22]/90 via-[#065f46]/80 to-[#041f18]/95 backdrop-blur-2xl border-emerald-400/40 hover:border-emerald-300 shadow-[0_16px_40px_rgba(16,185,129,0.3)]',
-      glowColor: 'bg-emerald-400/30',
-      badgeBg: 'bg-emerald-500/20 text-emerald-200 border-emerald-300/40',
-      textColor: 'text-emerald-300',
+      bgClass: isLight
+        ? 'bg-gradient-to-tr from-emerald-500 via-teal-600 to-cyan-700 border-emerald-300/60 shadow-[0_14px_35px_rgba(16,185,129,0.3)]'
+        : 'bg-gradient-to-tr from-[#022c22]/90 via-[#065f46]/80 to-[#041f18]/95 backdrop-blur-2xl border-emerald-400/40 hover:border-emerald-300 shadow-[0_16px_40px_rgba(16,185,129,0.3)]',
+      glowColor: isLight ? 'bg-emerald-300/40' : 'bg-emerald-400/30',
+      badgeBg: isLight ? 'bg-white/20 text-white border-white/40 font-bold' : 'bg-emerald-500/20 text-emerald-200 border-emerald-300/40',
+      textColor: 'text-white',
     },
   ]
 
@@ -89,31 +99,31 @@ export default function StackedCards({
               {/* Card Header Row */}
               <div className="flex items-center justify-between z-10">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-xl bg-white/10 border border-white/20 text-white shadow-sm">
+                  <div className="p-1.5 rounded-xl bg-white/20 border border-white/30 text-white shadow-sm">
                     <FontAwesomeIcon icon={card.icon} className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-cyan-100 truncate">
+                  <span className="text-xs font-bold uppercase tracking-wider text-white truncate">
                     {card.title}
                   </span>
                 </div>
 
-                <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${card.badgeBg}`}>
+                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${card.badgeBg}`}>
                   {card.badge}
                 </span>
               </div>
 
               {/* Card Middle */}
               <div className="z-10 my-1">
-                <p className="text-[11px] text-teal-200/80 font-normal">{card.subtitle}</p>
-                <h3 className="text-xl font-bold tracking-tight text-white mt-1 drop-shadow-md">
+                <p className="text-[11px] text-white/80 font-medium">{card.subtitle}</p>
+                <h3 className="text-xl font-black tracking-tight text-white mt-1 drop-shadow-md">
                   {formatCurrency(card.amount)}
                 </h3>
               </div>
 
               {/* Card Footer */}
-              <div className="flex items-center justify-between text-[10px] text-cyan-200/80 pt-2 border-t border-white/15 z-10">
-                <span className="flex items-center gap-1.5 font-medium text-emerald-400 text-[10px]">
-                  <FontAwesomeIcon icon={faShieldHalved} className="w-3 h-3" />
+              <div className="flex items-center justify-between text-[10px] text-white/90 pt-2 border-t border-white/20 z-10">
+                <span className="flex items-center gap-1.5 font-bold text-white text-[10px]">
+                  <FontAwesomeIcon icon={faShieldHalved} className="w-3 h-3 text-white" />
                   Himoyalangan Hisob
                 </span>
               </div>
@@ -127,7 +137,9 @@ export default function StackedCards({
             <div
               key={idx}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                mobileActiveIndex === idx ? 'w-6 bg-cyan-400 shadow-[0_0_8px_rgba(0,242,254,0.6)]' : 'w-1.5 bg-teal-500/30'
+                mobileActiveIndex === idx 
+                  ? (isLight ? 'w-6 bg-cyan-600 shadow-md' : 'w-6 bg-cyan-400 shadow-[0_0_8px_rgba(0,242,254,0.6)]') 
+                  : (isLight ? 'w-1.5 bg-cyan-400/40' : 'w-1.5 bg-teal-500/30')
               }`}
             />
           ))}
@@ -181,32 +193,32 @@ export default function StackedCards({
 
                 <div className="flex items-center justify-between z-10">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-xl bg-white/10 border border-white/20 text-white shadow-sm">
+                    <div className="p-1.5 rounded-xl bg-white/20 border border-white/30 text-white shadow-sm">
                       <FontAwesomeIcon icon={card.icon} className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-cyan-100">
+                    <span className="text-xs font-bold uppercase tracking-wider text-white">
                       {card.title}
                     </span>
                   </div>
 
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${card.badgeBg}`}>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${card.badgeBg}`}>
                     {card.badge}
                   </span>
                 </div>
 
                 <div className="z-10 my-1">
-                  <p className="text-[11px] text-teal-200/80 font-normal">{card.subtitle}</p>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1 drop-shadow-md">
+                  <p className="text-[11px] text-white/80 font-medium">{card.subtitle}</p>
+                  <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1 drop-shadow-md">
                     {formatCurrency(card.amount)}
                   </h3>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-cyan-200/80 pt-2 border-t border-white/15 z-10">
-                  <span className="flex items-center gap-1.5 font-medium text-emerald-400 text-[11px]">
-                    <FontAwesomeIcon icon={faShieldHalved} className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-between text-[10px] text-white/90 pt-2 border-t border-white/20 z-10">
+                  <span className="flex items-center gap-1.5 font-bold text-white text-[11px]">
+                    <FontAwesomeIcon icon={faShieldHalved} className="w-3.5 h-3.5 text-white" />
                     Himoyalangan Hisob
                   </span>
-                  <span className="text-slate-300/60 text-[9px] font-medium">Bosing</span>
+                  <span className="text-white/80 text-[9px] font-bold">Bosing</span>
                 </div>
               </div>
             )
