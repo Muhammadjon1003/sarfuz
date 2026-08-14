@@ -6,14 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faUser,
   faRightFromBracket,
-  faShieldHalved,
-  faPaperPlane,
   faCheckCircle,
-  faBolt,
   faWallet,
   faArrowTrendUp,
-  faArrowTrendDown,
-  faClock
+  faArrowTrendDown
 } from '@fortawesome/free-solid-svg-icons'
 import Loader from '@/components/Loader'
 
@@ -123,68 +119,6 @@ export default function Profile() {
           <p className="text-2xl font-black text-rose-400">
             {formatCurrency(summary?.total_expense || 0)}
           </p>
-        </div>
-      </div>
-
-      {/* Profile Details & System Preferences Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Connection Details */}
-        <div className="glass-panel p-6 rounded-3xl border border-teal-500/20 space-y-4">
-          <h3 className="text-base font-bold text-white flex items-center gap-2 border-b border-teal-500/15 pb-3">
-            <FontAwesomeIcon icon={faPaperPlane} className="w-4 h-4 text-cyan-400" />
-            Ulanish Ma'lumotlari
-          </h3>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/15 text-sm">
-              <span className="text-slate-400 font-medium">Telegram ID:</span>
-              <span className="font-mono font-bold text-cyan-300">{telegramId || '-'}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/15 text-sm">
-              <span className="text-slate-400 font-medium">Foydalanuvchi nomi:</span>
-              <span className="font-semibold text-slate-200">@{user?.username || 'Mavjud emas'}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/15 text-sm">
-              <span className="text-slate-400 font-medium">Til:</span>
-              <span className="font-semibold text-slate-200">O'zbek tili (UZ)</span>
-            </div>
-          </div>
-        </div>
-
-        {/* System & Security Status */}
-        <div className="glass-panel p-6 rounded-3xl border border-teal-500/20 space-y-4">
-          <h3 className="text-base font-bold text-white flex items-center gap-2 border-b border-teal-500/15 pb-3">
-            <FontAwesomeIcon icon={faShieldHalved} className="w-4 h-4 text-cyan-400" />
-            Tizim & Xavfsizlik
-          </h3>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/15 text-sm">
-              <span className="text-slate-400 font-medium flex items-center gap-2">
-                <FontAwesomeIcon icon={faBolt} className="w-4 h-4 text-emerald-400" />
-                Tizim Holati:
-              </span>
-              <span className="font-bold text-emerald-400">Onlayn • Real-vaqt</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/15 text-sm">
-              <span className="text-slate-400 font-medium flex items-center gap-2">
-                <FontAwesomeIcon icon={faClock} className="w-4 h-4 text-cyan-400" />
-                Avto-Sinxronizatsiya:
-              </span>
-              <span className="font-semibold text-cyan-300">Har soniyada</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/15 text-sm">
-              <span className="text-slate-400 font-medium flex items-center gap-2">
-                <FontAwesomeIcon icon={faShieldHalved} className="w-4 h-4 text-cyan-400" />
-                Ma'lumotlar Shifrlanishi:
-              </span>
-              <span className="font-semibold text-slate-200">256-bit AES</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
