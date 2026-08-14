@@ -3,10 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faChartPie, 
   faReceipt, 
-  faUserGroup, 
   faArrowTrendUp, 
-  faWandMagicSparkles, 
-  faFolderOpen, 
   faUser,
   faChevronLeft, 
   faChevronRight,
@@ -23,10 +20,7 @@ import logoDark from '@/assets/logo-dark.png'
 const navigation = [
   { name: "Boshqaruv bo'limi", href: '/', icon: faChartPie },
   { name: 'Amallar', href: '/transactions', icon: faReceipt },
-  { name: 'Qarzlar', href: '/debts', icon: faUserGroup },
   { name: 'Tahlil', href: '/analytics', icon: faArrowTrendUp },
-  { name: 'Prognoz', href: '/forecasting', icon: faWandMagicSparkles },
-  { name: 'Kategoriyalar', href: '/categories', icon: faFolderOpen },
   { name: 'Profil', href: '/profile', icon: faUser },
 ]
 
@@ -263,21 +257,21 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* Mobile & Tablet Bottom Navigation Bar (All Sections + Center Floating Plus Button) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#06181f]/95 backdrop-blur-2xl border-t border-teal-500/20 px-2 py-1.5 flex items-center justify-around shadow-[0_-10px_30px_rgba(0,0,0,0.6)] lg:hidden">
+      {/* Mobile & Tablet Bottom Navigation Bar (Primary Sections + Center Floating Plus Button) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#06181f]/95 backdrop-blur-2xl border-t border-teal-500/20 px-3 py-1.5 flex items-center justify-around shadow-[0_-10px_30px_rgba(0,0,0,0.6)] lg:hidden">
         {/* Boshqaruv bo'limi */}
         <NavLink
           to="/"
           end
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              'flex flex-col items-center justify-center w-11 h-11 rounded-xl transition-all',
               isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
             )
           }
           title="Boshqaruv bo'limi"
         >
-          <FontAwesomeIcon icon={faChartPie} className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FontAwesomeIcon icon={faChartPie} className="w-5 h-5" />
         </NavLink>
 
         {/* Amallar */}
@@ -285,36 +279,22 @@ export default function Layout() {
           to="/transactions"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              'flex flex-col items-center justify-center w-11 h-11 rounded-xl transition-all',
               isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
             )
           }
           title="Amallar"
         >
-          <FontAwesomeIcon icon={faReceipt} className="w-4 h-4 sm:w-5 sm:h-5" />
-        </NavLink>
-
-        {/* Qarzlar */}
-        <NavLink
-          to="/debts"
-          className={({ isActive }) =>
-            cn(
-              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
-              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
-            )
-          }
-          title="Qarzlar"
-        >
-          <FontAwesomeIcon icon={faUserGroup} className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FontAwesomeIcon icon={faReceipt} className="w-5 h-5" />
         </NavLink>
 
         {/* Center Floating Plus Action Button (Yangi Amal) */}
         <button
           onClick={() => setIsAddDialogOpen(true)}
-          className="relative -top-3 sm:-top-4 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 flex items-center justify-center text-slate-950 shadow-[0_0_20px_rgba(0,242,254,0.6)] border border-cyan-200/50 hover:scale-105 active:scale-95 transition-all flex-shrink-0"
+          className="relative -top-4 w-12 h-12 rounded-2xl bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 flex items-center justify-center text-slate-950 shadow-[0_0_20px_rgba(0,242,254,0.6)] border border-cyan-200/50 hover:scale-105 active:scale-95 transition-all flex-shrink-0"
           title="Yangi Amal Qo'shish"
         >
-          <FontAwesomeIcon icon={faPlus} className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2]" />
+          <FontAwesomeIcon icon={faPlus} className="w-6 h-6 stroke-[2]" />
         </button>
 
         {/* Tahlil */}
@@ -322,41 +302,27 @@ export default function Layout() {
           to="/analytics"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              'flex flex-col items-center justify-center w-11 h-11 rounded-xl transition-all',
               isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
             )
           }
           title="Tahlil"
         >
-          <FontAwesomeIcon icon={faArrowTrendUp} className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FontAwesomeIcon icon={faArrowTrendUp} className="w-5 h-5" />
         </NavLink>
 
-        {/* Prognoz */}
+        {/* Profil */}
         <NavLink
-          to="/forecasting"
+          to="/profile"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
+              'flex flex-col items-center justify-center w-11 h-11 rounded-xl transition-all',
               isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
             )
           }
-          title="Prognoz"
+          title="Profil"
         >
-          <FontAwesomeIcon icon={faWandMagicSparkles} className="w-4 h-4 sm:w-5 sm:h-5" />
-        </NavLink>
-
-        {/* Kategoriyalar */}
-        <NavLink
-          to="/categories"
-          className={({ isActive }) =>
-            cn(
-              'flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all',
-              isActive ? 'text-cyan-400 bg-cyan-500/15 border border-cyan-400/30' : 'text-slate-400 hover:text-slate-200'
-            )
-          }
-          title="Kategoriyalar"
-        >
-          <FontAwesomeIcon icon={faFolderOpen} className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
         </NavLink>
       </nav>
 

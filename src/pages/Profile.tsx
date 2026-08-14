@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
 import { getSummary } from '@/lib/api'
@@ -9,7 +10,11 @@ import {
   faCheckCircle,
   faWallet,
   faArrowTrendUp,
-  faArrowTrendDown
+  faArrowTrendDown,
+  faUserGroup,
+  faWandMagicSparkles,
+  faFolderOpen,
+  faChevronRight
 } from '@fortawesome/free-solid-svg-icons'
 import Loader from '@/components/Loader'
 
@@ -25,6 +30,30 @@ export default function Profile() {
   if (isLoading) {
     return <Loader />
   }
+
+  const additionalFeatures = [
+    {
+      title: 'Qarzlar',
+      description: 'Qarzdorliklar, berilgan va olingan qarzlar nazorati',
+      href: '/debts',
+      icon: faUserGroup,
+      badgeColor: 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300',
+    },
+    {
+      title: 'AI Prognoz',
+      description: 'Kelajakdagi pul oqimi va moliyaviy bashoratlar',
+      href: '/forecasting',
+      icon: faWandMagicSparkles,
+      badgeColor: 'bg-sky-500/15 border-sky-400/30 text-sky-300',
+    },
+    {
+      title: 'Kategoriyalar',
+      description: 'Daromad va chiqim kategoriyalarini boshqarish',
+      href: '/categories',
+      icon: faFolderOpen,
+      badgeColor: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300',
+    },
+  ]
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
@@ -119,6 +148,38 @@ export default function Profile() {
           <p className="text-2xl font-black text-rose-400">
             {formatCurrency(summary?.total_expense || 0)}
           </p>
+        </div>
+      </div>
+
+      {/* Qo'shimcha funksiyalar Section */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-extrabold text-white flex items-center gap-2 border-b border-teal-500/15 pb-3">
+          Qo'shimcha funksiyalar
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {additionalFeatures.map((feature) => (
+            <Link
+              key={feature.href}
+              to={feature.href}
+              className="glass-panel-interactive p-6 rounded-3xl border border-teal-500/20 hover:border-cyan-400/40 transition-all group flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-2xl border ${feature.badgeColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                    <FontAwesomeIcon icon={feature.icon} className="w-5 h-5" />
+                  </div>
+                  <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4 text-slate-500 group-hover:text-cyan-300 group-hover:translate-x-1 transition-all" />
+                </div>
+                <h3 className="text-base font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
